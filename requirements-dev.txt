@@ -1,0 +1,6 @@
+# Local development and tests only. The Vercel runtime deliberately skips the
+# sentence-transformers stack (torch is far too heavy for a serverless cold
+# start); questions are embedded through the HF Inference API there instead.
+-r requirements.txt
+sentence-transformers>=3
+pytest>=8

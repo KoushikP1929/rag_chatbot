@@ -90,7 +90,8 @@ _ENCODER_CACHE: dict[str, "Encode"] = {}
 
 def load_encoder(model_name: str) -> Encode:
     """One encoder per process: loading the model on every ask is wasted work."""
-    cached = _ENCODER_CACHE.get(model_name)
+    key = ("local", model_name)
+    cached = _ENCODER_CACHE.get(key)
     if cached is not None:
         return cached
     from sentence_transformers import SentenceTransformer
@@ -103,8 +104,54 @@ def load_encoder(model_name: str) -> Encode:
         matrix = model.encode(texts, batch_size=32, normalize_embeddings=True, show_progress_bar=False)
         return [row.tolist() for row in matrix]
 
-    _ENCODER_CACHE[model_name] = encode
+    _ENCODER_CACHE[key] = encode
     return encode
+
+
+def load_remote_encoder(model_name: str, endpoint: str | None = None, token: str | None = None) -> Encode:
+    """Question embeddings over the HF Inference API with the SAME model id as
+    ingestion, so serverless functions never have to load torch. The caller
+    normalizes vectors, exactly like the local encoder does."""
+    default = "https://api-inference.huggingface.co/models/{model}"
+    url = (endpoint or default).format(model=model_name)
+    key = ("hf-inference", url, bool(token))
+    cached = _ENCODER_CACHE.get(key)
+    if cached is not None:
+        return cached
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
+
+    def encode(texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        response = _hf_post(url, headers, texts)
+        if response.status_code != 200:
+            raise EmbedError(
+                "embedding.hf", f"inference endpoint returned HTTP {response.status_code}"
+            )
+        try:
+            vectors = response.json()
+        except ValueError as exc:
+            raise EmbedError("embedding.hf", "inference endpoint returned a non-JSON body") from exc
+        if not isinstance(vectors, list) or len(vectors) != len(texts):
+            raise EmbedError("embedding.hf", f"expected {len(texts)} vectors from the endpoint")
+        return vectors
+
+    _ENCODER_CACHE[key] = encode
+    return encode
+
+
+def _hf_post(url: str, headers: dict, texts: list[str]):
+    import httpx
+
+    return httpx.post(
+        url,
+        json={"inputs": texts, "options": {"wait_for_model": True}},
+        headers=headers,
+        timeout=45.0,
+    )
+
+
+_ENCODER_CACHE: dict[tuple, Encode] = {}
 
 
 def _refuse_model_mismatch(config: AppConfig, force: bool) -> None:

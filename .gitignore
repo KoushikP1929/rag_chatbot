@@ -5,10 +5,11 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
-data/raw/*
-data/documents/*
-data/chunks/*
-data/embeddings/*
+# The corpus snapshots travel with the repo so a serverless cold start can
+# rebuild the Chroma index without scraping: raw provenance, one document per
+# page, chunk rosters, and the embedding vectors. The vector store itself and
+# the query traces stay machine-local.
 data/chroma/*
 data/traces/*
-!data/**/.gitkeep
+!data/chroma/.gitkeep
+!data/traces/.gitkeep

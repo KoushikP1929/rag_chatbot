@@ -45,9 +45,12 @@ def retrieve(
         collection = _open_collection(config)
     _check_model_parity(collection, config)
     if embed is None:
-        from src.embed import load_encoder
+        from src.embed import load_encoder, load_remote_encoder
 
-        embed = load_encoder(config.embedding_model)
+        if config.query_provider == "hf-inference":
+            embed = load_remote_encoder(config.embedding_model, config.hf_endpoint, config.hf_token)
+        else:
+            embed = load_encoder(config.embedding_model)
     vectors = embed([question])
     if len(vectors) != 1:
         raise RetrievalError("retrieval", f"expected one question vector, got {len(vectors)}")
@@ -98,11 +101,27 @@ def _open_collection(config: AppConfig):
     client = chromadb.PersistentClient(path=str(config.vector_path))
     try:
         return client.get_collection(config.collection, embedding_function=StoredEmbeddings())
-    except Exception as exc:
-        raise RetrievalError(
-            "vectorstore",
-            f"collection {config.collection!r} not found; run python -m src.cli index first",
-        ) from exc
+    except Exception:
+        # Serverless cold start: build the index into the writable path from the
+        # committed embeddings, then retry once. A locally missing index is also
+        # repaired this way instead of failing the question.
+        try:
+            from src.index import index_embeddings
+
+            index_embeddings(config)
+        except Exception as exc:
+            raise RetrievalError(
+                "vectorstore",
+                f"collection {config.collection!r} unavailable and could not be built "
+                f"from the stored embeddings ({exc}); run python -m src.cli index first",
+            )
+        try:
+            return client.get_collection(config.collection, embedding_function=StoredEmbeddings())
+        except Exception as exc:
+            raise RetrievalError(
+                "vectorstore",
+                f"collection {config.collection!r} not found; run python -m src.cli index first",
+            ) from exc
 
 
 def _check_model_parity(collection, config: AppConfig) -> None:

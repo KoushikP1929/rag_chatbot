@@ -81,6 +81,9 @@ class AppConfig:
     embedding_dir: Path
     trace_dir: Path
     disclaimer: str
+    query_provider: str = "local"
+    hf_endpoint: str | None = None
+    hf_token: str | None = None
 
 
 def load_config(
@@ -134,11 +137,35 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
         raise ConfigError("retrieval.top_k", "expected an integer >= 1")
 
     disclaimer = _text(ui, "ui.disclaimer", "disclaimer")
+
+    # Environment overrides for serverless deployments: those hosts only make
+    # /tmp writable. Everything else keeps the configured repo-relative path.
+    if environ.get("VECTORSTORE_PATH", "").strip():
+        vector_path = Path(environ["VECTORSTORE_PATH"].strip())
+    else:
+        vector_path = _path(vectorstore, "vectorstore.persist_path", "persist_path")
+    if environ.get("TRACE_DIR", "").strip():
+        trace_dir = Path(environ["TRACE_DIR"].strip())
+    else:
+        trace_dir = _path(artifacts, "artifacts.trace_dir", "trace_dir")
+
+    embedding_block = embedding
+    query_provider = (environ.get("EMBEDDING_QUERY_PROVIDER") or embedding_block.get("query_provider", "local")).strip().lower()
+    if query_provider not in ("local", "hf-inference"):
+        raise ConfigError("embedding.query_provider", "must be 'local' or 'hf-inference'")
+    hf_endpoint_default = "https://api-inference.huggingface.co/models/{model}"
+    hf_endpoint = embedding_block.get("hf_endpoint", hf_endpoint_default)
+    hf_token = (environ.get("HF_API_TOKEN") or "").strip() or None
+    if query_provider == "hf-inference" and not hf_token:
+        raise ConfigError(
+            "HF_API_TOKEN",
+            "hf-inference question embeddings need a Hugging Face token; create a free one on huggingface.co/settings/tokens",
+        )
     return AppConfig(
         corpus=tuple(corpus),
         embedding_model=model,
         vector_engine=engine,
-        vector_path=_path(vectorstore, "vectorstore.persist_path", "persist_path"),
+        vector_path=vector_path,
         collection=collection,
         provider=provider,
         api_key=api_key,
@@ -149,8 +176,11 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
         document_dir=_path(artifacts, "artifacts.document_dir", "document_dir"),
         chunk_dir=_path(artifacts, "artifacts.chunk_dir", "chunk_dir"),
         embedding_dir=_path(artifacts, "artifacts.embedding_dir", "embedding_dir"),
-        trace_dir=_path(artifacts, "artifacts.trace_dir", "trace_dir"),
+        trace_dir=trace_dir,
         disclaimer=disclaimer,
+        query_provider=query_provider,
+        hf_endpoint=hf_endpoint,
+        hf_token=hf_token,
     )
 
 

@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "includeFiles": [
+        "config.yaml",
+        "data/embeddings/*",
+        "data/chunks/*",
+        "data/documents/_index.json",
+        "data/raw/_run.json"
+      ]
+    }
+  }
+}
