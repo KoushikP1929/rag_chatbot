@@ -1,0 +1,143 @@
+"""Embed chunk text with the configured sentence-transformers model."""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Callable
+
+from src.config import AppConfig
+from src.paths import page_file, safe_write
+
+Encode = Callable[[list[str]], list[list[float]]]
+
+
+class EmbedError(Exception):
+    """Existing embeddings were built with a different model."""
+
+    def __init__(self, field: str, message: str) -> None:
+        self.field = field
+        super().__init__(f"{field}: {message}")
+
+
+def embed_documents(config: AppConfig, encode: Encode | None = None, force: bool = False) -> dict:
+    config.embedding_dir.mkdir(parents=True, exist_ok=True)
+    _refuse_model_mismatch(config, force)
+    if encode is None:
+        encode = load_encoder(config.embedding_model)
+    written: list[str] = []
+    skipped: list[str] = []
+    dimension: int | None = None
+    embedded_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for page in config.corpus:
+        chunk_path = page_file(config.chunk_dir, page.slug)
+        embedding_path = page_file(config.embedding_dir, page.slug)
+        payload = _read(chunk_path)
+        chunks = payload.get("chunks") if isinstance(payload, dict) else None
+        if not isinstance(chunks, list):
+            skipped.append(page.slug)
+            if embedding_path.is_file():
+                embedding_path.unlink()
+            continue
+        usable = [
+            chunk
+            for chunk in chunks
+            if isinstance(chunk, dict) and isinstance(chunk.get("chunk_id"), str) and isinstance(chunk.get("text"), str)
+        ]
+        texts = [chunk["text"] for chunk in usable]
+        vectors = [_normalize(vector) for vector in encode(texts)] if texts else []
+        if len(vectors) != len(texts):
+            raise EmbedError("embedding", f"{page.slug} returned {len(vectors)} vectors for {len(texts)} chunks")
+        if vectors:
+            page_dimension = len(vectors[0])
+            if any(len(vector) != page_dimension for vector in vectors):
+                raise EmbedError("embedding", f"{page.slug} vectors do not share one dimension")
+            if dimension is None:
+                dimension = page_dimension
+            elif page_dimension != dimension:
+                raise EmbedError("embedding", f"{page.slug} dimension {page_dimension} does not match {dimension}")
+        rows = []
+        for chunk, vector in zip(usable, vectors):
+            metadata = {key: value for key, value in chunk.items() if key != "chunk_id"}
+            rows.append({"chunk_id": chunk["chunk_id"], "vector": vector, "metadata": metadata})
+        safe_write(
+            embedding_path,
+            _dumps(
+                {
+                    "slug": page.slug,
+                    "model": config.embedding_model,
+                    "embedded_at": embedded_at,
+                    "dimension": dimension or 0,
+                    "chunks": rows,
+                }
+            ),
+        )
+        written.append(page.slug)
+    summary = {
+        "model": config.embedding_model,
+        "dimension": dimension or 0,
+        "document_count": len(written),
+        "documents": written,
+        "skipped_slugs": skipped,
+    }
+    safe_write(config.embedding_dir / "_index.json", _dumps(summary))
+    return summary
+
+
+_ENCODER_CACHE: dict[str, "Encode"] = {}
+
+
+def load_encoder(model_name: str) -> Encode:
+    """One encoder per process: loading the model on every ask is wasted work."""
+    cached = _ENCODER_CACHE.get(model_name)
+    if cached is not None:
+        return cached
+    from sentence_transformers import SentenceTransformer
+
+    model = SentenceTransformer(model_name)
+
+    def encode(texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        matrix = model.encode(texts, batch_size=32, normalize_embeddings=True, show_progress_bar=False)
+        return [row.tolist() for row in matrix]
+
+    _ENCODER_CACHE[model_name] = encode
+    return encode
+
+
+def _refuse_model_mismatch(config: AppConfig, force: bool) -> None:
+    if force:
+        return
+    for page in config.corpus:
+        existing = _read(page_file(config.embedding_dir, page.slug))
+        if not isinstance(existing, dict):
+            continue
+        recorded = existing.get("model")
+        if isinstance(recorded, str) and recorded != config.embedding_model:
+            raise EmbedError(
+                "embedding.model",
+                f"existing embeddings used {recorded!r}; re-run with --force to replace them with {config.embedding_model!r}",
+            )
+
+
+def _normalize(vector: list[float]) -> list[float]:
+    norm = sum(value * value for value in vector) ** 0.5
+    if norm == 0:
+        return list(vector)
+    return [value / norm for value in vector]
+
+
+def _read(path: Path) -> dict | None:
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _dumps(payload: dict) -> str:
+    return json.dumps(payload, ensure_ascii=False) + "\n"

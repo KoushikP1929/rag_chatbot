@@ -1,0 +1,49 @@
+corpus:
+  - slug: amc-hdfc-mutual-funds
+    title: HDFC Mutual Fund — AMC overview
+    url: https://groww.in/mutual-funds/amc/hdfc-mutual-funds
+    kind: amc
+  - slug: hdfc-large-cap-fund-direct-growth
+    title: HDFC Large Cap Fund — Direct Growth
+    url: https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth
+    kind: scheme
+    scheme_name: HDFC Large Cap Fund Direct Growth
+  - slug: hdfc-flexi-cap-direct-growth
+    title: HDFC Flexi Cap Direct Plan Growth
+    url: https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth
+    kind: scheme
+    scheme_name: HDFC Flexi Cap Direct Plan Growth
+  - slug: hdfc-elss-tax-saver-fund-direct-plan-growth
+    title: HDFC ELSS Tax Saver Fund Direct Plan Growth
+    url: https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth
+    kind: scheme
+    scheme_name: HDFC ELSS Tax Saver Fund Direct Plan Growth
+  - slug: hdfc-mid-cap-fund-direct-growth
+    title: HDFC Mid Cap Fund Direct Growth
+    url: https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth
+    kind: scheme
+    scheme_name: HDFC Mid Cap Fund Direct Growth
+
+embedding:
+  model: sentence-transformers/all-MiniLM-L6-v2
+
+vectorstore:
+  engine: chroma
+  persist_path: data/chroma
+  collection: hdfc_facts
+
+llm:
+  provider: groq
+
+retrieval:
+  top_k: 5
+
+artifacts:
+  raw_dir: data/raw
+  document_dir: data/documents
+  chunk_dir: data/chunks
+  embedding_dir: data/embeddings
+  trace_dir: data/traces
+
+ui:
+  disclaimer: "Facts-only. No investment advice."
