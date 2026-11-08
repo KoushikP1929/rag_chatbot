@@ -29,7 +29,7 @@ embedding:
   # How the QUESTION is embedded at runtime. "local" loads sentence-transformers
   # (desktop/server). "hf-inference" calls the same model id over HTTP (Vercel).
   query_provider: local
-  hf_endpoint: https://api-inference.huggingface.co/models/{model}
+  hf_endpoint: https://router.huggingface.co/hf-inference/models/{model}
 
 vectorstore:
   engine: chroma

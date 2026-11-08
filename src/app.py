@@ -8,7 +8,6 @@ with the design tokens from `clear_trustworthy_fintech/DESIGN.md` inlined.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -29,6 +28,14 @@ def _config() -> AppConfig:
     return _state["config"]
 
 
+def _friendly_error(message: str) -> str:
+    """Never surface transport internals (errno strings, URLError text) in the UI."""
+    lowered = message.lower()
+    if "errno 16" in lowered or "urlopen error" in lowered or "connect" in lowered:
+        return "The assistant could not reach the fact service just now. Please try again in a few seconds."
+    return message
+
+
 @app.get("/", response_class=HTMLResponse)
 def page() -> HTMLResponse:
     return HTMLResponse(TEMPLATE)
@@ -42,14 +49,14 @@ def ask_route(payload: dict):
     try:
         result = answer_question(question.strip(), config=_config())
     except RetrievalError as exc:
-        return {"error": str(exc)}
+        return {"error": _friendly_error(str(exc))}
     except Exception as exc:  # noqa: BLE001 - the UI never shows a stack trace
         # TEMP DIAGNOSTIC: surfaced for the serverless rollout; revert to the
         # plain message once the deployment issue is identified.
         import traceback
 
         traceback.print_exc()
-        return {"error_type": type(exc).__name__, "error": str(exc)}
+        return {"error_type": type(exc).__name__, "error": _friendly_error(str(exc))}
     if result.mode == "pii":
         return JSONResponse(status_code=400, content={"error": result.answer, "mode": "pii"})
     return {
@@ -61,34 +68,6 @@ def ask_route(payload: dict):
         "query_id": result.query_id,
         "trace": result.trace,
     }
-
-
-@app.get("/net-probe")
-def net_probe() -> dict:
-    """TEMP: does outbound HTTPS work from this sandbox at all?"""
-    import json
-    import urllib.error
-    import urllib.request
-
-    results = {}
-    for name, url in (
-        ("huggingface-legacy", "https://api-inference.huggingface.co/models/all-MiniLM-L6-v2"),
-        ("huggingface-router", "https://router.huggingface.co/hf-inference/models/all-MiniLM-L6-v2"),
-        ("groq", "https://api.groq.com/openai/v1/models"),
-        ("github", "https://api.github.com/zen"),
-    ):
-        try:
-            request = urllib.request.Request(
-                url,
-                headers={"User-Agent": "rag-bot-net-probe/1.0", "Authorization": "Bearer " + (_config().api_key if name == "groq" else "")},
-            )
-            with urllib.request.urlopen(request, timeout=15) as response:
-                results[name] = {"status": response.status, "host": urllib.parse.urlparse(url).hostname}
-        except urllib.error.HTTPError as error:
-            results[name] = {"status": error.code, "note": "connected OK, got HTTP error"}
-        except Exception as error:
-            results[name] = {"status": "fail", "error_type": type(error).__name__, "error": str(error)}
-    return {"proxy_env": {k: v for k, v in os.environ.items() if "PROXY" in k.upper() or "proxy" in k}, "results": results}
 
 
 @app.get("/health")
@@ -609,7 +588,9 @@ document.querySelectorAll(".sugg-btn").forEach((button) =>
 fetch("/health").then((r) => r.json()).then((h) => {
   if (h && typeof h.indexed_chunks === "number") {
     document.getElementById("index-badge-text").textContent =
-      "Index: " + h.indexed_chunks + " chunks · " + h.corpus.length + " pages";
+      h.indexed_chunks > 0
+        ? "Index: " + h.indexed_chunks + " chunks · " + h.corpus.length + " pages"
+        : "Index warming up — ask a question to build it";
   } else {
     document.getElementById("index-badge-text").textContent = "Index not built — run src.cli index";
   }

@@ -44,14 +44,25 @@ def retrieve(
     if collection is None:
         collection = _open_collection(config)
     _check_model_parity(collection, config)
-    if embed is None:
-        from src.embed import load_encoder, load_remote_encoder
+    try:
+        if embed is None:
+            from src.embed import EmbedError, load_encoder, load_remote_encoder
 
-        if config.query_provider == "hf-inference":
-            embed = load_remote_encoder(config.embedding_model, config.hf_endpoint, config.hf_token)
-        else:
-            embed = load_encoder(config.embedding_model)
-    vectors = embed([question])
+            if config.query_provider == "hf-inference":
+                embed = load_remote_encoder(config.embedding_model, config.hf_endpoint, config.hf_token)
+            else:
+                embed = load_encoder(config.embedding_model)
+        vectors = embed([question])
+    except EmbedError:
+        raise
+    except Exception as exc:
+        # Question embedding is the one network-dependent retrieval step; never
+        # leak transport internals (URLError, ConnectError, errno strings) into
+        # the answer path.
+        raise RetrievalError(
+            "retrieval.embedding",
+            f"question embedding unavailable ({type(exc).__name__})",
+        ) from exc
     if len(vectors) != 1:
         raise RetrievalError("retrieval", f"expected one question vector, got {len(vectors)}")
     results = collection.query(

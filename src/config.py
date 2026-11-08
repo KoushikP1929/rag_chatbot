@@ -179,7 +179,7 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
     query_provider = (environ.get("EMBEDDING_QUERY_PROVIDER") or embedding_block.get("query_provider", "local")).strip().lower()
     if query_provider not in ("local", "hf-inference"):
         raise ConfigError("embedding.query_provider", "must be 'local' or 'hf-inference'")
-    hf_endpoint_default = "https://api-inference.huggingface.co/models/{model}"
+    hf_endpoint_default = "https://router.huggingface.co/hf-inference/models/{model}"
     hf_endpoint = embedding_block.get("hf_endpoint", hf_endpoint_default)
     hf_token = (environ.get("HF_API_TOKEN") or "").strip() or None
     if query_provider == "hf-inference" and not hf_token:

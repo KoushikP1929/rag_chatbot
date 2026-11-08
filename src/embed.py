@@ -112,7 +112,7 @@ def load_remote_encoder(model_name: str, endpoint: str | None = None, token: str
     """Question embeddings over the HF Inference API with the SAME model id as
     ingestion, so serverless functions never have to load torch. The caller
     normalizes vectors, exactly like the local encoder does."""
-    default = "https://api-inference.huggingface.co/models/{model}"
+    default = "https://router.huggingface.co/hf-inference/models/{model}"
     url = (endpoint or default).format(model=model_name)
     key = ("hf-inference", url, bool(token))
     cached = _ENCODER_CACHE.get(key)
