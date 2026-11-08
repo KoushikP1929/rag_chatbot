@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
@@ -52,6 +53,22 @@ class ConfigError(Exception):
     def __init__(self, field: str, message: str) -> None:
         self.field = field
         super().__init__(f"{field}: {message}")
+
+
+def _is_serverless(environ: Mapping[str, str]) -> bool:
+    """True on Vercel-like hosts where only the temp directory is writable."""
+    return bool(
+        (environ.get("VERCEL") or environ.get("VERCEL_ENV") or environ.get("NOW_REGION") or "").strip()
+    )
+
+
+def _serverless_tmp(name: str) -> Path:
+    """A writable path under the host's temp dir.
+
+    /tmp is scoped to one function instance, so each instance recreates the
+    index there without cross-instance SQLite contention (errno 16 EBUSY).
+    """
+    return Path(tempfile.gettempdir()) / "rag_bot" / name
 
 
 @dataclass(frozen=True)
@@ -138,14 +155,23 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
 
     disclaimer = _text(ui, "ui.disclaimer", "disclaimer")
 
-    # Environment overrides for serverless deployments: those hosts only make
-    # /tmp writable. Everything else keeps the configured repo-relative path.
+    # Environment overrides for serverless deployments. On those hosts (Vercel,
+    # etc.) only the temp dir is writable; the bundled repo directory is
+    # read-only, so Chroma's SQLite journal and trace writes fail with
+    # errno 16 (EBUSY). Explicit env overrides always win; otherwise Vercel
+    # defaults both to a per-instance writable temp path, where the cold-start
+    # rebuild in retrieve._open_collection builds the index on first question.
+    serverless = _is_serverless(environ)
     if environ.get("VECTORSTORE_PATH", "").strip():
         vector_path = Path(environ["VECTORSTORE_PATH"].strip())
+    elif serverless:
+        vector_path = _serverless_tmp("chroma")
     else:
         vector_path = _path(vectorstore, "vectorstore.persist_path", "persist_path")
     if environ.get("TRACE_DIR", "").strip():
         trace_dir = Path(environ["TRACE_DIR"].strip())
+    elif serverless:
+        trace_dir = _serverless_tmp("traces")
     else:
         trace_dir = _path(artifacts, "artifacts.trace_dir", "trace_dir")
 
