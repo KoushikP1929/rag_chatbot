@@ -14,7 +14,7 @@ Seven steps. Each one writes files you can open. Later steps read the previous s
 | 4 | Chunking | `data/chunks/` |
 | 5 | Embedding | `data/embeddings/` |
 | 6 | Storing data in vector DB | `data/chroma/` |
-| 7 | Retrieval logic and UI | `data/traces/`, one local page |
+| 7 | Retrieval logic and UI | `data/traces/`, one local page built from the Stitch design export |
 | 8 | Edge case and test case for guardrails | `src/guard.py`, `tests/` |
 
 ```bash
@@ -123,14 +123,22 @@ Done when the collection count equals the chunk count and a second run does not 
 
 The provider and `LLM_MODEL` come from config and `.env`. Nothing in code hardcodes the model id.
 
-The UI is one FastAPI page: a welcome line, three example questions (a scheme fact, ELSS lock-in, a refusal), a text box, the answer, one citation, the last-updated line, and `Facts-only. No investment advice.` A trace panel shows the sections and scores for the last question.
+**UI — the Stitch export is the source of truth.** The visual design lives in `stitch_hdfc_fund_facts_assistant/` (generated with Google Stitch):
+
+- `clear_trustworthy_fintech/DESIGN.md` — tokens: green `#00B386` primary, slate `#44475B`/`#6E7485` text, canvas `#F6F7F9`, border `#E6E8EC`, alert `#EB5350` (refusal rail only); Inter 400/500/600; 8pt spacing; flat elevation levels.
+- `hdfc_fund_facts_assistant/` — canonical desktop screen: white answer cards with 1px `#E6E8EC` border and 12px radius, citation chip with external-link icon, refusal card with 4px red left rail, three suggested-question cards, centered `Facts-only. No investment advice.` caption, sticky rounded input pill with a green circular send button.
+- `hdfc_fund_facts_assistant_mobile/` — responsive reference (single column, bottom-locked input under 768px).
+- `*_citation_modal/` — reference for promoting the trace/citation panel to a modal (not yet implemented).
+- `*_sip_comparison/` — **excluded**: a returns-comparison calculator is prohibited by PRD non-goals; it is a discarded exploration only.
+
+`src/app.py` implements the canonical desktop screen on the real `ask()` contract, with the design tokens inlined as CSS variables (no Tailwind CDN or third-party JS; Inter from Google Fonts with system fallback). Answer cards are shaped by `mode` (fact / advice / returns / out_of_scope); the citation is always the system-attached `citation` field; `/health` fills the top-bar index badge and the footer last-updated line. The trace panel (`details`) shows the retrieved sections and scores for the last question.
 
 ```bash
 python -m src.cli ask "What is the exit load on HDFC Large Cap Fund?"
 uvicorn src.app:app --reload --port 8000
 ```
 
-Done when a fact question returns a cited answer, advice and returns questions are refused, and the three examples work in the browser.
+Done when a fact question returns the Stitch answer card with one cited link, advice and returns questions get the red-rail refusal card, the three suggested-question chips work in the browser, and every answer shows the last-updated line and the standing disclaimer.
 
 ## 8. Edge case and test case for guardrails
 

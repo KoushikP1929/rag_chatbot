@@ -54,7 +54,7 @@ Everything runs locally. The only outbound calls are the five HTTP fetches at in
 | Vector store | ChromaDB, `PersistentClient` | Local path from config |
 | LLM access | Thin provider adapter interface | Groq default; Gemini, OpenAI, Anthropic, Mistral allowed |
 | Config | YAML (or JSON) + `.env` via `python-dotenv` | Secrets only in `.env` |
-| Web UI | Small server-rendered or lightweight local app (FastAPI + single HTML page) | One page per PRD §9 |
+| Web UI | Small server-rendered or lightweight local app (FastAPI + single HTML page) | One page per PRD §9. **UI design source of truth: `stitch_hdfc_fund_facts_assistant/`** (see §9) |
 | Testing | `pytest` | Unit tests for guard, chunker, citation selection, provider switch |
 
 Provider access is behind one interface so a provider/model change is a config edit, not a code edit:
@@ -75,6 +75,13 @@ rag_bot/
 ├── README.md
 ├── config.yaml
 ├── .env.example
+├── stitch_hdfc_fund_facts_assistant/ # UI design export — source of truth for the web UI (§9)
+│   ├── clear_trustworthy_fintech/DESIGN.md           # design tokens + component specs
+│   ├── hdfc_fund_facts_assistant/                    # canonical desktop chat screen (code.html + screen.png)
+│   ├── hdfc_fund_facts_assistant_mobile/             # responsive < 768px reference
+│   ├── hdfc_fund_facts_desktop_citation_modal/       # citation bottom-sheet reference
+│   ├── hdfc_fund_facts_source_citation_modal/        # mobile citation sheet reference
+│   └── *_sip_comparison/, *_active_keyboard/         # exploration screens — see exclusions
 ├── src/
 │   ├── config.py            # load + validate config and env
 │   ├── paths.py             # artifact paths, slugs
@@ -360,11 +367,41 @@ Artifacts are plain JSON and openable without the app, satisfying PRD §11.
 
 ## 9. UI Architecture
 
-- FastAPI (or equivalent) serves one HTML page and a `POST /ask` endpoint.
-- Page contains: welcome line naming the assistant and covered pages; three clickable example questions (a scheme fact, ELSS lock-in, a refusal case); text input + submit; answer with one citation and the last-updated line; standing disclaimer; optional trace panel for the last question (retrieved sections, scores, citation URL).
+### 9.1 Design source of truth
+
+The web UI is designed in **Google Stitch**. The export lives in `stitch_hdfc_fund_facts_assistant/` and is the **source of truth for everything visual** — colors, typography, spacing, radii, shadows, and component anatomy. Behavior is defined by `prd.md` and this document; how the UI looks comes from the export:
+
+| Export | Role |
+| --- | --- |
+| `clear_trustworthy_fintech/DESIGN.md` | Token sheet: color roles, Inter type scale, 8pt spacing, elevation levels, component specs |
+| `hdfc_fund_facts_assistant/code.html` + `screen.png` | **Canonical desktop screen** — chat stream, user bubble, answer card with citation chip, refusal card with red rail, suggestion chips, disclaimer, sticky input pill |
+| `hdfc_fund_facts_assistant_mobile/` | Responsive reference below 768px (single column, 16px margins, bottom-locked input) |
+| `hdfc_fund_facts_desktop_citation_modal/`, `hdfc_fund_facts_source_citation_modal/` | Citation detail sheet reference (used when the trace panel is promoted to a modal) |
+| `*_active_keyboard/`, `*_sip_comparison/` | Exploration screens only |
+
+**Palette used by the implemented UI** (from the export): primary green `#00B386` (CTAs, links, focus), dark slate `#44475B` (text), secondary slate `#6E7485` (metadata/captions), canvas `#F6F7F9`, card white `#FFFFFF`, border `#E6E8EC`, alert red `#EB5350` strictly for the refusal rail/pill. Typography is Inter 400/500/600 only; financial values use tabular numerals.
+
+### 9.2 Ported implementation
+
+- FastAPI (`src/app.py`) serves one HTML page (`TEMPLATE`) and the `POST /ask` endpoint.
+- `TEMPLATE` is the canonical Stitch desktop screen re-implemented on the real `ask()` contract. Stitch's Tailwind CDN classes are translated to inlined CSS custom properties from `DESIGN.md` so the page works fully offline with no third-party JS/CSS; Inter loads from Google Fonts with a system-font fallback.
+- Component mapping: user bubble (q-bubble) → `answer`/`query_id`; assistant answer card → mode-shaped card (`fact` = green accent + "Fact" pill; `advice`/`returns` = red rail + refusal pill; `out_of_scope` = neutral rail); source citation chip → `citation` URL (system-attached, never model text); citations and trace render from `data/traces/<query-id>.json` content returned via `/ask`.
+- The trace panel (`details`) shows retrieved sections, scores, and source URLs from the returned trace object — the demo of the RAG stages without opening `data/` (raised to a modal later using the citation-modal export).
+- `/health` feeds the top-bar index badge (chunk count, page count, last scrape date) and the footer last-updated line.
+- PII guard runs server-side; a 400 from `/ask` renders as an error card in the stream with the remove-and-resubmit message.
+
+### 9.3 Explicit exclusions from the export
+
+The Stitch studio generated some screens beyond the PRD; they are **not** implemented:
+
+- **`hdfc_fund_facts_desktop_citation_sip_comparison`** — a Direct-vs-Regular SIP returns calculator. Prohibited by PRD §4 (no return calculations, no comparisons). It is kept only as a discarded exploration, never referenced by the implemented page.
+- **Session-history rail, fund-directory/saved-queries bottom nav, "Active Inquiry Session" cards** — PRD §4 excludes user accounts and chat-history persistence.
+- **Demo metric grids and seeded demo turns** in the mock screens are replaced by real answers; expense/load figures render inside the answer text produced by the pipeline, not hand-built metric tiles.
+
+### 9.4 Behavior rules
+
 - The UI is a thin client over the same `ask()` path the CLI uses; no business logic is duplicated in the browser.
-- PII guard runs server-side. On detection the UI shows the removal/resubmit message and no LLM call occurs.
-- The trace panel is read from the just-written trace object, so the demo shows the RAG stages without opening `data/`.
+- No answer, citation, or disclaimer copy is composed in JavaScript; the UI renders exactly what `ask()` returns. The standing disclaimer `Facts-only. No investment advice.` is rendered as a permanent centered caption (config string) and appended inside each answer card.
 
 ## 10. Security, Privacy, and Scope Controls
 

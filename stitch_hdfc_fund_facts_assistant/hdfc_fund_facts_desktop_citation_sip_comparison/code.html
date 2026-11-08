@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>HDFC Fund Facts Assistant</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-fixed": "#dfe1fa", "surface-bright": "#f8f9fb", "on-background": "#191c1e", "primary-fixed": "#71fac8", "surface-dim": "#d9dadc", "on-tertiary-fixed": "#151b29", "on-error-container": "#93000a", "on-surface-variant": "#3c4a43", "on-secondary-fixed": "#171a2c", "error": "#ba1a1a", "outline": "#6c7a73", "surface-container-high": "#e7e8ea", "secondary": "#5a5d72", "surface-tint": "#006c4f", "on-primary-container": "#003d2c", "outline-variant": "#bbcac1", "tertiary-fixed-dim": "#c0c6d9", "surface": "#f8f9fb", "surface-container-lowest": "#ffffff", "secondary-container": "#dcdef7", "on-tertiary-fixed-variant": "#414756", "on-primary-fixed-variant": "#00513b", "inverse-primary": "#50ddad", "border-subtle": "#E6E8EC", "alert-refusal": "#EB5350", "inverse-on-surface": "#f0f1f3", "tertiary-container": "#979daf", "surface-container": "#edeef0", "tertiary-fixed": "#dde2f6", "surface-variant": "#e1e2e4", "on-primary-fixed": "#002116", "on-tertiary-container": "#2e3543", "primary-container": "#00b386", "on-tertiary": "#ffffff", "on-primary": "#ffffff", "surface-container-low": "#f2f4f6", "surface-card": "#FFFFFF", "primary-fixed-dim": "#50ddad", "secondary-fixed-dim": "#c3c5dd", "error-container": "#ffdad6", "surface-container-highest": "#e1e2e4", "primary": "#006c4f", "background": "#f8f9fb", "on-secondary-container": "#5f6176", "tertiary": "#585e6f", "on-surface": "#191c1e", "inverse-surface": "#2e3132", "on-secondary": "#ffffff", "on-secondary-fixed-variant": "#43465a", "on-error": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-2xs": "0.25rem", "space-xl": "2rem", "space-md": "1rem", "space-xs": "0.5rem", "space-sm": "0.75rem", "space-lg": "1.5rem", "margin": "2rem", "margin-mobile": "1rem", "gutter-mobile": "1rem", "gutter": "1.5rem", "space-2xl": "3rem" }, "fontFamily": { "label-sm": ["Inter"], "display-lg": ["Inter"], "body-lg": ["Inter"], "code-num": ["Inter"], "body-md-medium": ["Inter"], "display-lg-mobile": ["Inter"], "body-sm": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }], "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "code-num": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "body-md-medium": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "500" }], "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-border-subtle"><div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><img alt="HDFC Fund Facts Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrD8sbagMLDJxEN_QYv09-eF0bhkJ-g95WKsVOo5DVDyNcbeAZhjgAOSqzWERNPQPMctToF8N1UgO3CZ-Ynaxfq_iz9Na2nEP1kEjGziesiV-GoMRa7J-tr4nzkMhJJOrMXxhQDOAVLjTZubY21iuabcmfBSjL697sZzhsnYIfxNjfPUzsL_6qvLQQxnmtZeCS6LL42ymnrKDkZbbL6yM0q1xQzc8LyriS2dbiGdB3og"/><span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">HDFC Fund Facts Assistant</span></div><nav class="hidden lg:flex items-center gap-space-lg ml-space-md" data-active-classes="text-primary font-semibold"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="assistant-overview" href="#">Overview</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="fund-explorer" href="#">Fund Explorer</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="factsheet-analytics" href="#">Factsheet Analytics</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="compliance-disclosures" href="#">Disclosures</a></nav></div><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-sm"><span class="inline-flex items-center px-space-sm py-space-2xs rounded-full font-label-md text-label-md bg-primary-container/10 text-primary-container font-medium">Index: 5 sources</span><span class="font-label-md text-label-md text-secondary">Last updated: 07 Nov 2026</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 min-h-[calc(100vh-64px)] bg-surface"><div class="flex flex-col w-full relative">
+<!-- Underlay: Desktop Chat Assistant Interface Context (Slightly dimmed behind the modal) -->
+<div class="w-full max-w-[1440px] mx-auto px-margin py-space-lg flex gap-space-xl opacity-40 blur-[1px] pointer-events-none select-none transition-all duration-300">
+<!-- Left Navigation/History Rail (Desktop 320px) -->
+<aside class="hidden lg:flex flex-col w-[320px] shrink-0 gap-space-md">
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Active Inquiry Session</span>
+<span class="inline-flex items-center px-space-xs py-0.5 rounded-full bg-primary-container/10 text-primary font-label-sm text-label-sm font-semibold">Live Index</span>
+</div>
+<div class="p-space-sm bg-surface-container-low rounded-lg">
+<p class="font-body-md-medium text-body-md-medium text-on-surface">HDFC Mid-Cap Opportunities</p>
+<p class="font-body-sm text-body-sm text-secondary truncate">TER, Exit Load &amp; Historical AUM Breakdown</p>
+</div>
+<div class="p-space-sm rounded-lg hover:bg-surface-container-low">
+<p class="font-body-md text-body-md text-secondary">HDFC Top 100 Fund - Direct vs Reg</p>
+<p class="font-body-sm text-body-sm text-outline truncate">NAV as on 06 Nov 2026</p>
+</div>
+</div>
+<!-- Quick Metrics Pinned Card -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Benchmark Guardrails</span>
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary">Factsheet Date</span>
+<span class="font-code-num text-code-num text-on-surface">31 Oct 2026</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary">Deterministic Pass</span>
+<span class="font-label-md text-label-md text-primary font-semibold">100% Synced</span>
+</div>
+</div>
+</aside>
+<!-- Main Chat Feed (Desktop 760px) -->
+<div class="flex-1 max-w-[760px] flex flex-col gap-space-lg">
+<!-- User Message -->
+<div class="flex items-start justify-end gap-space-sm">
+<div class="bg-surface-container-high px-space-md py-space-sm rounded-xl max-w-[80%]">
+<p class="font-body-md text-body-md text-on-surface">What is the expense ratio and exit load for HDFC Mid-Cap Opportunities Fund (Direct Plan)?</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-label-md text-label-md font-semibold">
+          ME
+        </div>
+</div>
+<!-- Assistant Factual Response Card -->
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary text-[18px]">verified</span>
+</div>
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm w-full flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Factual Expense &amp; Load Disclosure</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px]">fact_check</span> 1 Verifiable Ref
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface">
+            Based on the October 2026 statutory factsheet for <strong class="font-semibold text-on-surface">HDFC Mid-Cap Opportunities Fund</strong>:
+          </p>
+<div class="grid grid-cols-2 gap-space-sm bg-surface-container-low p-space-sm rounded-lg">
+<div>
+<p class="font-label-sm text-label-sm text-secondary">DIRECT PLAN TER</p>
+<p class="font-headline-md text-headline-md text-primary font-semibold">0.76%</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-secondary">EXIT LOAD (≤ 1 YEAR)</p>
+<p class="font-headline-md text-headline-md text-on-surface font-semibold">1.00%</p>
+</div>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<button class="inline-flex items-center gap-1.5 font-label-md text-label-md text-primary font-medium hover:underline">
+<span class="material-symbols-outlined text-[16px]">library_books</span>
+              Inspect Grounding Citation
+            </button>
+<span class="font-body-sm text-body-sm text-secondary">SEBI Regulated Fact Sheet</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Ambient Backdrop Scrim -->
+<div class="fixed inset-0 z-40 bg-on-surface/50 backdrop-blur-[2px] transition-opacity duration-300 flex items-center justify-center p-space-md" id="modal-backdrop">
+<!-- Desktop Modal Popup Dialog (Width ~680px for rich comparison experience) -->
+<div aria-labelledby="modal-title" aria-modal="true" class="relative w-full max-w-[680px] bg-surface-container-lowest rounded-2xl shadow-xl flex flex-col overflow-hidden transform scale-100 transition-all duration-200" id="citation-dialog" role="dialog">
+<!-- Top Subtle Security Accent Bar -->
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-primary-container to-primary-fixed"></div>
+<!-- Modal Header -->
+<div class="p-space-lg pb-space-md flex items-start justify-between gap-space-md bg-surface-container-lowest">
+<div class="flex items-start gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-primary-container/15 flex items-center justify-center text-primary-container shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[24px]">verified_user</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight" id="modal-title">Source Citation &amp; Grounding Audit</h2>
+<span class="material-symbols-outlined text-[18px] text-primary" title="Cryptographically Audited Extraction">verified</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">
+              Verifiable factual data extracted from official scheme disclosures &amp; SEBI statutory filing.
+            </p>
+</div>
+</div>
+<button aria-label="Close dialog" class="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:bg-surface-container-high hover:text-on-surface transition-colors shrink-0" id="close-modal-btn">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Modal Body Content -->
+<div class="px-space-lg pb-space-lg flex flex-col gap-space-md max-h-[calc(85vh-160px)] overflow-y-auto">
+<!-- 1. Verification / Trust Banner -->
+<div class="bg-primary/10 rounded-xl p-space-md flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px] shrink-0 mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">100% Verifiable Source Match</span>
+<span class="font-label-sm text-label-sm bg-primary text-on-primary px-1.5 py-0.5 rounded-full uppercase tracking-wider">Zero Hallucination</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Deterministic guardrails passed without synthetic extrapolation. Extracted verbatim from verified official SID/Factsheet via Groww Terminal Index.
+            </p>
+</div>
+</div>
+<!-- 2. Grounding Metadata Grid (2-column key-value cards) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+<!-- Item 1: Grounding URI -->
+<div class="bg-surface-container-low p-space-sm rounded-xl flex flex-col justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Grounding Resource URI</span>
+<div class="mt-1 flex items-center gap-1.5">
+<a class="font-body-md-medium text-body-md-medium text-primary hover:underline truncate inline-flex items-center gap-1" href="https://groww.in/mutual-funds/hdfc-mid-cap-opportunities-fund-direct-growth" rel="noopener noreferrer" target="_blank">
+<span class="truncate">groww.in/mf/hdfc-mid-cap...</span>
+<span class="material-symbols-outlined text-[16px] shrink-0">open_in_new</span>
+</a>
+</div>
+</div>
+<!-- Item 2: Sync Timestamp -->
+<div class="bg-surface-container-low p-space-sm rounded-xl flex flex-col justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Sync Timestamp</span>
+<p class="mt-1 font-body-md-medium text-body-md-medium text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+              07 Nov 2026, 06:30 AM IST <span class="font-label-sm text-label-sm text-secondary font-normal">(Daily sync)</span>
+</p>
+</div>
+<!-- Item 3: Regulatory Document Ref -->
+<div class="bg-surface-container-low p-space-sm rounded-xl flex flex-col justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Regulatory Document Ref</span>
+<p class="mt-1 font-body-md-medium text-body-md-medium text-on-surface truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">description</span>
+              HDFC AMC Oct/Nov 2026 Factsheet &amp; SID
+            </p>
+</div>
+<!-- Item 4: Scheme Code / SEBI ID -->
+<div class="bg-surface-container-low p-space-sm rounded-xl flex flex-col justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Scheme Code / SEBI ID</span>
+<p class="mt-1 font-code-num text-code-num text-on-surface font-semibold flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+              HDFC-MIDCAP-DIR-8812 • <span class="text-primary font-label-md text-label-md">Verified</span>
+</p>
+</div>
+</div>
+<!-- 3. Direct Plan vs Regular Plan Breakdown -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between px-1">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-2xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Direct Plan vs Regular Plan Breakdown</span>
+<span class="material-symbols-outlined text-[16px] text-primary">compare_arrows</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary">Official AMC Factsheet Expense &amp; Yield Variance</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm border border-border-subtle">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Direct Plan</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-primary/10 text-primary font-semibold">Lower Expense Ratio</span>
+</div>
+<div class="flex flex-col gap-space-2xs text-body-sm">
+<div class="flex items-center justify-between py-1 border-b border-border-subtle">
+<span class="text-secondary">Total Expense Ratio (TER)</span>
+<span class="font-code-num text-code-num font-semibold text-primary">0.76% p.a.</span>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-border-subtle">
+<span class="text-secondary">Distributor Commission</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">Nil (0%)</span>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-border-subtle">
+<span class="text-secondary">Factsheet 5Y CAGR</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">24.12%</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="text-secondary">Current NAV</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">₹182.40</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm border border-border-subtle">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Regular Plan</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-secondary-container text-on-secondary-container font-semibold">Distributor Commission Included</span>
+</div>
+<div class="flex flex-col gap-space-2xs text-body-sm">
+<div class="flex items-center justify-between py-1 border-b border-border-subtle">
+<span class="text-secondary">Total Expense Ratio (TER)</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">1.58% p.a.</span>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-border-subtle">
+<span class="text-secondary">Distributor Commission</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">0.82% p.a. embedded</span>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-border-subtle">
+<span class="text-secondary">Factsheet 5Y CAGR</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">23.30%</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="text-secondary">Current NAV</span>
+<span class="font-code-num text-code-num font-semibold text-on-surface">₹168.15</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-primary-container/10 p-space-sm rounded-xl flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0">trending_up</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant"><strong class="font-semibold text-primary">TER Difference:</strong> 0.82% saved annually in Direct Plan compounds into higher portfolio NAV.</p>
+</div>
+</div>
+<!-- 4. Interactive SIP Returns Calculator: Direct Plan vs Regular Plan -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-2xl p-space-md sm:p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs pb-space-xs border-b border-border-subtle">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[20px]">calculate</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">SIP Impact Simulator: Direct vs Regular</h3>
+<p class="font-body-sm text-body-sm text-secondary">See how saving 0.82% TER compounds your wealth over time</p>
+</div>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-container-low rounded-full self-start sm:self-auto">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-secondary">TER Gap: <strong class="text-on-surface font-semibold">0.82% p.a.</strong></span>
+</div>
+</div>
+<!-- Controls: Monthly Investment & Horizon -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md items-center">
+<!-- Monthly Investment Slider & Input -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-secondary" for="sip-amount-range">Monthly SIP</label>
+<div class="flex items-center bg-surface-container-low border border-border-subtle rounded-lg px-2.5 py-1 focus-within:border-primary-container transition-colors">
+<span class="font-body-md-medium text-secondary mr-0.5">₹</span>
+<input class="w-24 bg-transparent font-code-num font-semibold text-on-surface text-right focus:outline-none" id="sip-amount-input" max="100000" min="1000" step="500" type="number" value="10000"/>
+</div>
+</div>
+<input class="w-full h-1.5 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary" id="sip-amount-range" max="100000" min="1000" step="500" type="range" value="10000"/>
+<div class="flex items-center justify-between text-[11px] text-secondary font-medium px-0.5">
+<span>₹1K</span>
+<span>₹25K</span>
+<span>₹50K</span>
+<span>₹1L</span>
+</div>
+</div>
+<!-- Horizon Selection Pills -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary">Investment Horizon</span>
+<span class="font-label-sm text-label-sm text-primary font-semibold" id="horizon-display">10 Years</span>
+</div>
+<div class="grid grid-cols-4 gap-1.5 bg-surface-container-low p-1 rounded-xl border border-border-subtle" id="horizon-pills">
+<button class="py-1.5 rounded-lg font-label-md text-label-md font-medium text-secondary hover:text-on-surface transition-all horizon-btn" data-years="3" type="button">3Y</button>
+<button class="py-1.5 rounded-lg font-label-md text-label-md font-medium text-secondary hover:text-on-surface transition-all horizon-btn" data-years="5" type="button">5Y</button>
+<button class="py-1.5 rounded-lg font-label-md text-label-md font-semibold bg-surface-container-lowest text-primary shadow-sm transition-all horizon-btn" data-years="10" type="button">10Y</button>
+<button class="py-1.5 rounded-lg font-label-md text-label-md font-medium text-secondary hover:text-on-surface transition-all horizon-btn" data-years="15" type="button">15Y</button>
+</div>
+<div class="flex items-center justify-between text-[11px] text-secondary px-0.5">
+<span>Direct CAGR: <strong class="text-primary font-semibold">15.0%</strong></span>
+<span>Regular CAGR: <strong class="text-on-surface font-semibold">14.18%</strong></span>
+</div>
+</div>
+</div>
+<!-- Calculated Wealth Difference Highlight Card -->
+<div class="bg-gradient-to-r from-primary/10 via-primary-container/10 to-transparent border border-primary/20 rounded-xl p-space-sm sm:p-space-md flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[22px]">savings</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Direct Plan Extra Wealth Advantage</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Zero intermediary cuts compound straight into your portfolio</p>
+</div>
+</div>
+<div class="text-left sm:text-right shrink-0">
+<span class="font-headline-lg text-headline-lg text-primary font-bold tracking-tight" id="sip-diff-value">+₹1,68,233</span>
+<p class="font-label-sm text-label-sm text-secondary">Extra returns earned</p>
+</div>
+</div>
+<!-- Real-time Comparison Table / Metrics -->
+<div class="grid grid-cols-3 gap-space-2xs sm:gap-space-sm pt-1">
+<div class="bg-surface-container-low p-space-sm rounded-xl flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Total Invested</span>
+<p class="font-headline-sm text-headline-sm font-semibold text-on-surface mt-0.5" id="sip-invested-value">₹12,00,000</p>
+<span class="font-label-sm text-label-sm text-secondary mt-1">₹10K × 120 mo</span>
+</div>
+<div class="bg-primary/10 border border-primary/20 p-space-sm rounded-xl flex flex-col relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary font-semibold">Direct Plan</span>
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-semibold text-primary mt-0.5" id="sip-direct-value">₹27,86,573</p>
+<span class="font-label-sm text-label-sm text-primary font-medium mt-1">15.00% p.a.</span>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded-xl flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Regular Plan</span>
+<p class="font-headline-sm text-headline-sm font-semibold text-on-surface mt-0.5" id="sip-regular-value">₹26,18,340</p>
+<span class="font-label-sm text-label-sm text-secondary mt-1">14.18% p.a. (TER lost)</span>
+</div>
+</div>
+<!-- Dual Horizontal Progress Visualizer -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex items-center justify-between text-body-sm font-medium">
+<span class="text-secondary flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span> Direct Value
+</span>
+<span class="font-code-num text-on-surface font-semibold" id="bar-direct-label">₹27.87 Lakhs</span>
+</div>
+<div class="w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden flex">
+<div class="h-full bg-primary rounded-full transition-all duration-300" id="bar-direct-fill" style="width: 100%;"></div>
+</div>
+<div class="flex items-center justify-between text-body-sm font-medium mt-1">
+<span class="text-secondary flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> Regular Value
+</span>
+<span class="font-code-num text-secondary" id="bar-regular-label">₹26.18 Lakhs</span>
+</div>
+<div class="w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden flex">
+<div class="h-full bg-secondary/80 rounded-full transition-all duration-300" id="bar-regular-fill" style="width: 93.9%;"></div>
+</div>
+</div>
+<!-- Subtle Financial Calculator Footnote -->
+<p class="text-[11px] text-secondary leading-normal pt-1 border-t border-border-subtle">
+* Projections assume monthly SIP compounded periodically at benchmark annualized yield (Direct: 15.00% vs Regular: 14.18% adjusting for 0.82% TER commission spread). For statutory illustration purposes; actual NAVs fluctuate with market performance.
+</p>
+</div>
+<!-- 5. Raw Official Factsheet Excerpt (Highlighted Inspection Box) -->
+<div class="flex flex-col gap-space-2xs">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">
+              Raw Official Factsheet Excerpt (Sec 4.2 • AMC Statutory Expenses)
+            </span>
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">policy</span> Exact Match
+            </span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<p class="font-code-num text-code-num text-on-surface-variant leading-relaxed" id="citation-raw-text">
+              “Expense Ratio: Regular Plan 1.58%, <mark class="bg-primary/20 text-on-primary-container px-1.5 py-0.5 rounded font-semibold">Direct Plan 0.76%</mark> (TER as of Oct 31, 2026). Exit Load: For redemptions within 1 year from allotment date, an exit load of <mark class="bg-primary/20 text-on-primary-container px-1.5 py-0.5 rounded font-semibold">1.00%</mark> is applicable; nil thereafter.”
+            </p>
+</div>
+</div>
+<!-- 6. SEBI Regulatory Guardrails Notice -->
+<div class="p-space-sm bg-surface-container-lowest rounded-xl flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-secondary shrink-0 mt-0.5">info</span>
+<p class="font-body-sm text-body-sm text-secondary">
+            This citation audit confirms adherence to SEBI CIR/P/2019 mutual fund information distribution guidelines. Facts-only extraction strictly bound to authoritative AMC monthly disclosures. No financial advice or return guarantees.
+          </p>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="p-space-md px-space-lg bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<!-- Terminal Trust Seal -->
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">token</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Groww Research Terminal</span>
+<span class="font-label-sm text-label-sm text-secondary leading-tight">Deterministic Data Pipeline • SEBI Reg. AMFI</span>
+</div>
+</div>
+<!-- Modal Actions -->
+<div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
+<button class="h-10 px-space-md rounded-lg font-label-md text-label-md font-medium text-secondary hover:text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-1.5" id="copy-citation-btn">
+<span class="material-symbols-outlined text-[16px]" id="copy-icon">content_copy</span>
+<span class="copy-label" id="copy-label">Copy Citation Text</span>
+</button>
+<a class="h-10 px-space-md bg-primary-container text-on-primary rounded-lg font-label-md text-label-md font-medium hover:bg-primary transition-colors flex items-center justify-center gap-1.5 shadow-sm" href="https://groww.in/mutual-funds/hdfc-mid-cap-opportunities-fund-direct-growth" rel="noopener noreferrer" target="_blank">
+<span>Open Source on Groww.in</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function initCitationModal() {
+    const backdrop = document.getElementById('modal-backdrop');
+    const closeBtn = document.getElementById('close-modal-btn');
+    const copyBtn = document.getElementById('copy-citation-btn');
+    const copyLabel = document.getElementById('copy-label');
+    const copyIcon = document.getElementById('copy-icon');
+    const rawTextEl = document.getElementById('citation-raw-text');
+
+    if (closeBtn && backdrop) {
+      const closeModal = () => {
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          backdrop.style.display = 'none';
+        }, 200);
+      };
+      closeBtn.addEventListener('click', closeModal);
+      
+      // Close on clicking backdrop outside container
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) {
+          closeModal();
+        }
+      });
+
+      // Escape key binding
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
+    }
+
+    if (copyBtn && rawTextEl) {
+      copyBtn.addEventListener('click', async () => {
+        const textToCopy = rawTextEl.innerText.replace(/[“”]/g, '').trim();
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          copyLabel.textContent = 'Citation Copied!';
+          copyIcon.textContent = 'check';
+          copyBtn.classList.add('text-primary');
+          setTimeout(() => {
+            copyLabel.textContent = 'Copy Citation Text';
+            copyIcon.textContent = 'content_copy';
+            copyBtn.classList.remove('text-primary');
+          }, 2400);
+        } catch (err) {
+          console.warn('Clipboard write prevented', err);
+        }
+      });
+    }
+
+    // Interactive SIP Returns Calculator Logic
+    const sipRange = document.getElementById('sip-amount-range');
+    const sipInput = document.getElementById('sip-amount-input');
+    const horizonButtons = document.querySelectorAll('.horizon-btn');
+    const horizonDisplay = document.getElementById('horizon-display');
+
+    const investedValEl = document.getElementById('sip-invested-value');
+    const directValEl = document.getElementById('sip-direct-value');
+    const regularValEl = document.getElementById('sip-regular-value');
+    const diffValEl = document.getElementById('sip-diff-value');
+    const barDirectFill = document.getElementById('bar-direct-fill');
+    const barRegularFill = document.getElementById('bar-regular-fill');
+    const barDirectLabel = document.getElementById('bar-direct-label');
+    const barRegularLabel = document.getElementById('bar-regular-label');
+
+    let currentYears = 10;
+    const directRate = 0.15; // 15.0% annual CAGR
+    const regularRate = 0.1418; // 14.18% annual CAGR (0.82% lower due to TER)
+
+    function formatINR(val) {
+      return '₹' + Math.round(val).toLocaleString('en-IN');
+    }
+
+    function formatLakhs(val) {
+      const lakhs = val / 100000;
+      return '₹' + lakhs.toFixed(2) + ' Lakhs';
+    }
+
+    // Standard SIP Future Value Formula: P * [ ((1+i)^n - 1) / i ] * (1+i)
+    function calculateSIP(monthlyP, annualRate, years) {
+      const i = annualRate / 12;
+      const n = years * 12;
+      if (i === 0) return monthlyP * n;
+      return monthlyP * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
+    }
+
+    function updateCalculations() {
+      let p = parseFloat(sipRange.value) || 10000;
+      if (p < 1000) p = 1000;
+      if (p > 100000) p = 100000;
+
+      const totalInvested = p * currentYears * 12;
+      const directFV = calculateSIP(p, directRate, currentYears);
+      const regularFV = calculateSIP(p, regularRate, currentYears);
+      const diff = directFV - regularFV;
+
+      if (investedValEl) investedValEl.textContent = formatINR(totalInvested);
+      if (directValEl) directValEl.textContent = formatINR(directFV);
+      if (regularValEl) regularValEl.textContent = formatINR(regularFV);
+      if (diffValEl) diffValEl.textContent = '+' + formatINR(diff);
+
+      if (barDirectLabel) barDirectLabel.textContent = formatLakhs(directFV);
+      if (barRegularLabel) barRegularLabel.textContent = formatLakhs(regularFV);
+
+      if (barDirectFill && barRegularFill) {
+        barDirectFill.style.width = '100%';
+        const regularPct = Math.min(100, Math.max(10, (regularFV / directFV) * 100));
+        barRegularFill.style.width = regularPct.toFixed(1) + '%';
+      }
+    }
+
+    if (sipRange && sipInput) {
+      sipRange.addEventListener('input', (e) => {
+        sipInput.value = e.target.value;
+        updateCalculations();
+      });
+
+      sipInput.addEventListener('input', (e) => {
+        let val = Number(e.target.value);
+        if (val > 100000) val = 100000;
+        sipRange.value = val;
+        updateCalculations();
+      });
+
+      sipInput.addEventListener('blur', (e) => {
+        let val = Number(e.target.value);
+        if (val < 1000) val = 1000;
+        if (val > 100000) val = 100000;
+        sipInput.value = val;
+        sipRange.value = val;
+        updateCalculations();
+      });
+    }
+
+    horizonButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        horizonButtons.forEach(b => {
+          b.className = 'py-1.5 rounded-lg font-label-md text-label-md font-medium text-secondary hover:text-on-surface transition-all horizon-btn';
+        });
+        btn.className = 'py-1.5 rounded-lg font-label-md text-label-md font-semibold bg-surface-container-lowest text-primary shadow-sm transition-all horizon-btn';
+        currentYears = parseInt(btn.getAttribute('data-years'), 10) || 10;
+        if (horizonDisplay) horizonDisplay.textContent = currentYears + ' Years';
+        updateCalculations();
+      });
+    });
+
+    // Run initial computation
+    updateCalculations();
+  })();
+</script></main><footer class="w-full bg-surface-container-lowest border-t border-border-subtle py-space-lg"><div class="max-w-[1440px] mx-auto px-margin flex flex-col md:flex-row items-center justify-between gap-space-md font-body-sm text-body-sm text-secondary"><div class="flex items-center gap-space-md"><span class="font-body-md-medium text-body-md-medium text-on-surface">HDFC Mutual Fund Information Terminal</span><span>•</span><span>Factual fund analytics &amp; disclosures</span></div><div class="flex items-center gap-space-lg"><a class="hover:text-on-surface transition-colors" href="#">SEBI Statutory Guidelines</a><a class="hover:text-on-surface transition-colors" href="#">Terms of Use</a><a class="hover:text-on-surface transition-colors" href="#">Privacy Policy</a></div></div></footer>
+</body></html>
