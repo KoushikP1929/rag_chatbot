@@ -43,7 +43,12 @@ def ask_route(payload: dict):
     except RetrievalError as exc:
         return {"error": str(exc)}
     except Exception as exc:  # noqa: BLE001 - the UI never shows a stack trace
-        return {"error": str(exc)}
+        # TEMP DIAGNOSTIC: surfaced for the serverless rollout; revert to the
+        # plain message once the deployment issue is identified.
+        import traceback
+
+        traceback.print_exc()
+        return {"error_type": type(exc).__name__, "error": str(exc)}
     if result.mode == "pii":
         return JSONResponse(status_code=400, content={"error": result.answer, "mode": "pii"})
     return {
