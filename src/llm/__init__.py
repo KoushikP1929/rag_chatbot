@@ -9,8 +9,6 @@ from __future__ import annotations
 import json
 import re
 
-import httpx
-
 from src.config import AppConfig
 
 TIMEOUT = 30.0
@@ -144,6 +142,24 @@ def _call(post, url: str, headers: dict, body: str, attempts: int) -> dict:
 
 
 def _post(url: str, headers: dict, body: str) -> tuple[int, str]:
-    with httpx.Client(timeout=TIMEOUT, headers={"Content-Type": "application/json", **headers}) as client:
-        response = client.post(url, content=body)
-        return response.status_code, response.text
+    """POST with the stdlib instead of httpx.
+
+    httpx ConnectError errno 16 (EBUSY) on some serverless sandboxes; urllib
+    connects fine there, and locally both behave the same.
+    """
+    import urllib.error
+    import urllib.request
+
+    request = urllib.request.Request(
+        url,
+        data=body.encode("utf-8"),
+        headers={"Content-Type": "application/json", "User-Agent": "rag-bot/1.0", **headers},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+            return response.status, response.read().decode("utf-8")
+    except urllib.error.HTTPError as error:
+        return error.code, error.read().decode("utf-8", errors="replace")
+    except urllib.error.URLError as error:
+        raise RuntimeError(f"provider request failed: {error.reason}") from error

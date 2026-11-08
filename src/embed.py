@@ -141,14 +141,38 @@ def load_remote_encoder(model_name: str, endpoint: str | None = None, token: str
 
 
 def _hf_post(url: str, headers: dict, texts: list[str]):
-    import httpx
+    """POST with the stdlib instead of httpx.
 
-    return httpx.post(
+    httpx ConnectError errno 16 (EBUSY) on some serverless sandboxes; urllib
+    connects fine there, and locally both behave the same.
+    """
+    import json as _json
+    import urllib.request
+
+    request = urllib.request.Request(
         url,
-        json={"inputs": texts, "options": {"wait_for_model": True}},
-        headers=headers,
-        timeout=45.0,
+        data=_json.dumps({"inputs": texts, "options": {"wait_for_model": True}}).encode("utf-8"),
+        headers={"Content-Type": "application/json", "User-Agent": "rag-bot/1.0", **headers},
+        method="POST",
     )
+    try:
+        with urllib.request.urlopen(request, timeout=45) as response:
+            return _HTTPResponse(response.status, response.read())
+    except urllib.error.HTTPError as error:
+        return _HTTPResponse(error.code, error.read())
+
+
+class _HTTPResponse:
+    """The small shape (status_code + json) the encoder code expects."""
+
+    def __init__(self, status_code: int, body: bytes) -> None:
+        self.status_code = status_code
+        self._body = body
+
+    def json(self) -> list:
+        import json as _json
+
+        return _json.loads(self._body.decode("utf-8"))
 
 
 _ENCODER_CACHE: dict[tuple, Encode] = {}
