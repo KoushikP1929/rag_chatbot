@@ -72,7 +72,8 @@ def net_probe() -> dict:
 
     results = {}
     for name, url in (
-        ("huggingface", "https://api-inference.huggingface.co/models/all-MiniLM-L6-v2"),
+        ("huggingface-legacy", "https://api-inference.huggingface.co/models/all-MiniLM-L6-v2"),
+        ("huggingface-router", "https://router.huggingface.co/hf-inference/models/all-MiniLM-L6-v2"),
         ("groq", "https://api.groq.com/openai/v1/models"),
         ("github", "https://api.github.com/zen"),
     ):
