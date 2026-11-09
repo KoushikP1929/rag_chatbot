@@ -4,9 +4,8 @@ A small RAG assistant that answers **facts** about four HDFC Mutual Fund schemes
 
 > ⚠️ **Facts-only. No investment advice.**
 
-- 🔗 **Prototype / live app:** `__ADD-LINK__`
-- 🔗 **GitHub repo:** `__ADD-LINK__`
-- 🎬 **Demo video (≤3 min):** `__ADD-LINK__` *(only if the app is not hosted)*
+- 🔗 **Prototype / live app:** https://ragchatbot-dusky.vercel.app/
+- 🔗 **GitHub repo:** https://github.com/KoushikP1929/rag_chatbot
 
 ---
 
@@ -48,7 +47,7 @@ A small RAG assistant that answers **facts** about four HDFC Mutual Fund schemes
 
 ```bash
 # 1. clone
-git clone __ADD-LINK__
+git clone https://github.com/KoushikP1929/rag_chatbot.git
 cd rag_bot
 
 # 2. install
