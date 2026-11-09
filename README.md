@@ -1,11 +1,12 @@
-# MF FAQ Assistant for Groww — Facts-Only Q&A (RAG with Citations)
+# HDFC Fund Facts Assistant (Groww corpus) — Facts-Only MF FAQ
 
-A small FAQ assistant that answers **facts** about mutual fund schemes — expense ratio, exit load, minimum SIP, ELSS lock-in, riskometer, benchmark, and how to download statements — using **only official public pages** (HDFC AMC / SEBI / AMFI / Groww). Every answer contains **exactly one source link** and the line `Last updated from sources: <date>`. Answers are ≤ 3 sentences.
+A small RAG assistant that answers **facts** about four HDFC Mutual Fund schemes — expense ratio, exit load, minimum SIP, ELSS lock-in, riskometer, benchmark — using **only the five official Groww pages** in its corpus. Every answer carries **exactly one source link**, a `Last updated from sources:` date, and stays within **3 sentences**. Opinionated, returns, out-of-corpus and PII queries are refused by a pre-LLM guard.
 
 > ⚠️ **Facts-only. No investment advice.**
 
-- 🔗 **Prototype:** `__ADD-LINK__` (app/demo)
-- 🎬 **Demo video (≤3 min):** `__ADD-LINK__` *(only if app not hosted)*
+- 🔗 **Prototype / live app:** `__ADD-LINK__`
+- 🔗 **GitHub repo:** `__ADD-LINK__`
+- 🎬 **Demo video (≤3 min):** `__ADD-LINK__` *(only if the app is not hosted)*
 
 ---
 
@@ -13,103 +14,165 @@ A small FAQ assistant that answers **facts** about mutual fund schemes — expen
 
 | Item | Selection |
 |---|---|
-| **Product platform** | **Groww** (groww.in — official help/FAQ pages used for product how-to answers) |
-| **AMC chosen** | **HDFC Asset Management Company** (hdfcfund.com) |
-| **Scheme 1 — Large-cap** | HDFC Bluechip Fund |
-| **Scheme 2 — Flexi-cap** | HDFC Flexi Cap Fund |
-| **Scheme 3 — ELSS** | HDFC ELSS Tax Saver Fund |
+| **Product platform** | **Groww** — all five indexed pages are public groww.in pages |
+| **AMC** | **HDFC Mutual Fund** |
+| **Scheme 1** | HDFC Large Cap Fund — Direct Growth |
+| **Scheme 2** | HDFC Flexi Cap Fund — Direct Plan Growth |
+| **Scheme 3** | HDFC ELSS Tax Saver Fund — Direct Plan Growth |
+| **Scheme 4** | HDFC Mid Cap Fund — Direct Growth |
+| **AMC page** | HDFC Mutual Fund — AMC overview |
 
-**Why this scope:** all three schemes under one AMC have complete, stable, official public documentation (KIM/SID, factsheets, scheme FAQs, riskometer & benchmark pages), which makes citations accurate and easy to verify. One large-cap + one flexi-cap + one ELSS covers the key FAQ categories: TER/exit load/minimum SIP (large & flexi), lock-in (ELSS), riskometer, benchmark, and statement download (Groww help).
+**Corpus size: 5 pages** (1 AMC overview + 4 scheme pages). All five are live, public, and re-scrapable with one command.
+
+> 📌 **Note on page count:** the milestone asks for 15–25 source pages. This prototype currently indexes **5** (the five Groww pages above). Expanding the corpus (KIM/SID, factsheets, SEBI/AMFI pages, statement guides) is listed under *Known limits* and is the next step — the ingestion pipeline (`config.yaml` allow-list → `src.cli all`) is already built to take more pages.
 
 ---
 
-## 2. Setup
+## 2. Stack & Architecture
+
+| Layer | Implementation |
+|---|---|
+| Web UI / API | **FastAPI** (`src/app.py`) — single-page chat UI in Groww design tokens |
+| Input guard | `src/guard.py` — PII detection + intent / scheme / advice / returns classification (regex, pre-LLM) |
+| Retrieval | **Chroma** vector store, section-filtered top-k (`k = 5`) |
+| Embeddings | **`gemini-embedding-001`** (768 dims) |
+| Generation | **Groq** LLM (configurable via `config.yaml` + `.env`) |
+| Post-checks | `src/answer.py` — strips URLs, enforces ≤ 3 sentences, validates citation against the 5-page allow-list |
+| Audit | Every query writes a JSON trace to `data/traces/<query_id>.json` |
+
+**Answer flow:** `question → PII guard → mode (fact / advice / returns / out_of_scope) → intent + scheme detection → Chroma retrieval filtered to the matching section & scheme → grounded prompt → Groq → finalize (≤ 3 sentences, no URLs) → citation from the retrieved chunk → UI card + trace`.
+
+---
+
+## 3. Setup (local)
 
 ```bash
-git clone __ADD-LINK__ .   # your repo URL (if someone clones fresh)
+# 1. clone
+git clone __ADD-LINK__
+cd rag_bot
+
+# 2. install
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS/Linux
 pip install -r requirements.txt
-python app.py
+
+# 3. keys
+copy .env.example .env          # then fill GROQ_API_KEY, GEMINI_API_KEY, LLM_MODEL
+
+# 4. validate config
+python -m src.cli config-check
+
+# 5. run the web app
+python -m src.app               # → http://127.0.0.1:8000
 ```
 
-- **Stack:** Python + [RAG/retrieval layer — small keyword/embedding index over the 20 collected source pages]
-- No login, no database: the assistant stores **no personal data** of any kind.
+*(Optional)* rebuild the whole index from the five Groww pages:
+
+```bash
+python -m src.cli all           # scrape → load → chunk → embed → index
+python -m src.cli index --verify
+```
+
+**Deploy:** `vercel.json` is included (`app.py` is the ASGI entrypoint, `maxDuration: 60`). Set `GROQ_API_KEY`, `GEMINI_API_KEY`, `LLM_MODEL`, and optionally `EMBEDDING_QUERY_PROVIDER=gemini`.
 
 ---
 
-## 3. How to Use
+## 4. Using the Prototype
 
-The on-screen UI shows a welcome line, **3 example questions**, and the permanent disclaimer:
+**UI** (`/`): welcome/scope card, **3 example question chips**, sticky input, and the permanent line **“Facts-only. No investment advice.”**
+
+Example chips that ship in the UI:
+
+1. What is the expense ratio of HDFC Large Cap Fund?
+2. What is the lock-in period for HDFC ELSS Tax Saver Fund?
+3. Should I buy HDFC Mid Cap Fund? *(demonstrates the refusal path)*
+
+**API:**
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /ask` `{"question": "..."}` | Returns `answer`, `citation`, `last_updated`, `mode`, `query_id`, `trace` |
+| `GET /health` | Corpus slugs, chunk count, embedding model, LLM model, last scrape date |
+
+**CLI:**
+
+```bash
+python -m src.cli ask "What is the exit load on HDFC Flexi Cap Fund?"
+```
+
+---
+
+## 5. Corpus Facts Snapshot (scraped 2026-11-07)
+
+All values are **Direct plan** figures exactly as published on the indexed Groww pages.
+
+| Scheme | Expense ratio | Exit load | Min SIP | Lock-in | Riskometer | Benchmark |
+|---|---|---|---|---|---|---|
+| HDFC Large Cap Fund | 1.01% | 1% if redeemed within 1 year | ₹100 | None | Moderately High | NIFTY 100 TRI |
+| HDFC Flexi Cap Fund | 0.75% | 1% if redeemed within 1 year | ₹100 | None | Moderately High | NIFTY 500 TRI |
+| HDFC ELSS Tax Saver Fund | 1.20% | Nil | ₹500 | 3 years | Moderately High | NIFTY 500 TRI |
+| HDFC Mid Cap Fund | 0.74% | 1% if redeemed within 1 year | ₹100 | None | Moderately High | NIFTY Midcap 150 TRI |
+
+`Last updated from sources: 2026-11-07T06:30:25Z`
+
+---
+
+## 6. Source List (5 indexed pages)
+
+| # | Page | URL |
+|---|---|---|
+| 1 | HDFC Mutual Fund — AMC overview | https://groww.in/mutual-funds/amc/hdfc-mutual-funds |
+| 2 | HDFC Large Cap Fund — Direct Growth | https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth |
+| 3 | HDFC Flexi Cap — Direct Plan Growth | https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth |
+| 4 | HDFC ELSS Tax Saver Fund — Direct Plan Growth | https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth |
+| 5 | HDFC Mid Cap Fund — Direct Growth | https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth |
+
+Full machine-readable list: **`sources.csv`**.
+
+---
+
+## 7. Sample Q&A
+
+See **`sample_qa.md`** for the full set (10 queries, including refusals and the PII rejection). Short excerpt:
+
+**Q: What is the expense ratio of HDFC Large Cap Fund?**
+> The direct plan expense ratio of HDFC Large Cap Fund is 1.01%. Last updated from sources: 2026-11-07.
+> 📎 https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth
+
+**Q: Should I buy HDFC Mid Cap Fund?** *(refusal)*
+> I cannot advise on whether to buy, sell, or switch between schemes. I can look up facts like the expense ratio, exit load, minimum SIP, lock-in, riskometer, or benchmark instead.
+> 📎 https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth
+
+---
+
+## 8. Disclaimer (exact UI text)
 
 > **Facts-only. No investment advice.**
 
-**Example questions rendered in the UI:**
+The answer cards additionally carry: *“Answers come from five indexed Groww pages… Every answer cites one of those pages.”* The long-form version for README/support use:
 
-1. What is the expense ratio of HDFC Bluechip Fund?
-2. What is the lock-in period for HDFC ELSS Tax Saver Fund?
-3. How do I download my capital gains statement on Groww?
-
-**Refusal behaviour:** for opinionated/portfolio questions ("Which fund should I buy?", "Should I sell?"), the assistant replies with a **polite facts-only message + educational link** (Section 5, Q8).
+> **Facts-only. No investment advice.** This assistant answers factual questions about HDFC Mutual Fund schemes using five official public Groww pages and always shows one source link. It does not recommend schemes, predict returns, or compare performance, and it stores no personal information. Last updated from sources: 2026-11-07.
 
 ---
 
-## 4. Source List (15–25 official public pages only)
+## 9. Constraints Compliance
 
-| # | Source | What it's used for |
-|---|--------|--------------------|
-| 1 | Key Information Memorandum (KIM) — HDFC Bluechip Fund | TER, exit load, min SIP, benchmark, riskometer |
-| 2 | Scheme Information Document (SID) — HDFC Bluechip Fund | Full scheme terms |
-| 3 | Factsheet — HDFC Bluechip Fund | Latest TER %, benchmark, riskometer |
-| 4 | KIM — HDFC Flexi Cap Fund | TER, exit load, min SIP, benchmark, riskometer |
-| 5 | SID — HDFC Flexi Cap Fund | Full scheme terms |
-| 6 | Factsheet — HDFC Flexi Cap Fund | Latest TER %, benchmark, riskometer |
-| 7 | KIM — HDFC ELSS Tax Saver Fund | 3-yr lock-in, min SIP, benchmark, riskometer |
-| 8 | SID — HDFC ELSS Tax Saver Fund | Full scheme terms incl. lock-in provisions |
-| 9 | Factsheet — HDFC ELSS Tax Saver Fund | Latest TER %, benchmark, riskometer |
-| 10 | Scheme FAQs — HDFC AMC | Exit load & lock-in confirmations |
-| 11 | Fees / charges page — HDFC AMC | TER / stamp duty facts |
-| 12 | Riskometer & benchmark methodology notes — HDFC AMC | Riskometer categories |
-| 13 | Statement / tax-doc download guide — HDFC AMC (or Groww help) | Capital gains statement steps |
-| 14 | Groww help — download capital gains statement | Product how-to |
-| 15 | Groww help — download consolidated account statement | Product how-to |
-| 16 | SEBI — Mutual Funds investor page | Baseline facts & lock-in regulation |
-| 17 | AMFI — Investor education page | ELSS / SIP educational link (used in refusals) |
-| 18 | SEBI master circular on mutual funds | Lock-in (ELSS = 3 years) authority |
-| 19 | HDFC AMC — scheme returns/factsheet download page | Redirect target for "performance" questions |
-| 20 | Groww scheme page — HDFC Bluechip Fund | Cross-check of TER/load |
-
-📄 **Full list with URLs:** see `sources.csv` in this repo. *(URLs intentionally left as `__ADD-LINK__` placeholders — fill before submitting.)*
+- ✅ **Public sources only** — five public groww.in pages, enforced by a `config.yaml` allow-list (`ALLOWED_CORPUS`); no blogs, no back-end screenshots.
+- ✅ **Every answer has exactly one citation** — the URL is taken from the retrieved chunk and validated against the five-page allow-list before display.
+- ✅ **≤ 3 sentences** — `src/answer.py::finalize` hard-caps output; model-generated URLs are stripped.
+- ✅ **No PII** — the guard detects PAN, Aadhaar, email, phone, OTP and account-number patterns before retrieval/LLM and rejects with a 400 + polite message. Nothing is stored.
+- ✅ **No performance claims** — a returns guard refuses return/performance/CAGR questions and points to the AMC page; the prompt also forbids return numbers.
+- ✅ **Facts-only refusals** — advice/portfolio/“which fund” questions get a fixed, polite refusal (no LLM involvement).
+- ✅ **Transparency** — every query writes a trace (retrieved chunks, prompt, raw output, final answer, citation) to `data/traces/`.
 
 ---
 
-## 5. Sample Q&A (see `sample_qa.md` for the full 8)
+## 10. Known Limits
 
-**Q1 — "What is the expense ratio of HDFC Bluechip Fund?"**
-> The direct plan TER of HDFC Bluechip Fund is 0.32% (as of the latest factsheet); the regular plan TER is 0.63%. Expense ratios change periodically, so verify against the current factsheet. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (factsheet)
-
-**Q8 — "Which fund should I buy — Bluechip or Flexi Cap?"** *(refusal)*
-> I can't recommend which scheme to buy or sell — I share facts only from official sources, not investment advice. For education on how to evaluate schemes, see AMFI's investor education page. 📎 `__ADD-LINK__`
-
----
-
-## 6. Disclaimer Snippet (exact text shown in UI)
-
-> **Facts-only. No investment advice.** This assistant answers factual questions about mutual fund schemes using official public pages (AMC/SEBI/AMFI) and always shows one source link. It does not recommend schemes, predict returns, or compare performance, and it stores no personal information. Last updated from sources: `<date>`.
-
----
-
-## 7. Constraints Followed
-
-- ✅ Public sources only (HDFC AMC / SEBI / AMFI / Groww official pages) — no blogs, no back-end screenshots.
-- ✅ **No PII:** the assistant never accepts or stores PAN, Aadhaar, account numbers, OTPs, emails, or phone numbers.
-- ✅ **No performance/return claims:** return questions are politely refused and redirected to the official factsheet (see Q7 in `sample_qa.md`).
-- ✅ Every answer ≤ 3 sentences, with **exactly one** citation link and a `Last updated from sources:` date.
-
----
-
-## 8. Known Limits
-
-- Small corpus (~20 pages): only the 3 selected HDFC AMC schemes are in scope; other AMCs/products are refused.
-- TER and load figures change frequently — dates shown are the last source-fetch dates; check the live factsheet for current values.
-- Retrieval is keyword/embedding based on a tiny index; phrased differently, some questions may need rewording to match (W3 limitation).
-- Performance, tax-advice, and "which is better" questions are out of scope by design.
+- **Corpus is 5 pages**, below the milestone’s 15–25 target. Missing: KIM/SID, factsheets, fee pages, SEBI/AMFI pages, and a statement-download guide.
+- **No statement-download source is indexed.** The guard recognises the intent, but the corpus has no statement section, so the answer falls back to *“I don’t have that fact in the indexed pages”* with the AMC-page link.
+- **Only Direct-plan Growth pages** — Regular plan, IDCW and other AMC schemes are out of scope and refused politely.
+- **Values are a point-in-time snapshot** (2026-11-07). TER, loads and benchmarks change; re-run `python -m src.cli all` to refresh.
+- **Runtime needs network keys** — Groq for answers, Gemini for question embeddings (`EMBEDDING_QUERY_PROVIDER=gemini` on serverless). If either is unavailable the app degrades to a safe fallback message instead of guessing.
+- **Retrieval is section-filtered**, so unusual phrasings can miss; the supported intents are expense ratio, exit load, minimum SIP, lock-in, riskometer, benchmark (and statement, when a source exists).

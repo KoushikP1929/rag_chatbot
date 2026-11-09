@@ -1,21 +1,6 @@
-id,product,amc,scheme,category,source_type,description,url,used_for,date_verified
-1,Groww,HDFC AMC,HDFC Bluechip Fund,large-cap,KIM,"Key Information Memorandum - HDFC Bluechip Fund",__ADD-LINK__,TER / exit load / min SIP / benchmark / riskometer,
-2,Groww,HDFC AMC,HDFC Bluechip Fund,large-cap,SID,"Scheme Information Document - HDFC Bluechip Fund",__ADD-LINK__,Full scheme terms,
-3,Groww,HDFC AMC,HDFC Bluechip Fund,large-cap,Factsheet,"Latest factsheet - HDFC Bluechip Fund",__ADD-LINK__,Latest TER / benchmark / riskometer,
-4,Groww,HDFC AMC,HDFC Flexi Cap Fund,flexi-cap,KIM,"Key Information Memorandum - HDFC Flexi Cap Fund",__ADD-LINK__,TER / exit load / min SIP / benchmark / riskometer,
-5,Groww,HDFC AMC,HDFC Flexi Cap Fund,flexi-cap,SID,"Scheme Information Document - HDFC Flexi Cap Fund",__ADD-LINK__,Full scheme terms,
-6,Groww,HDFC AMC,HDFC Flexi Cap Fund,flexi-cap,Factsheet,"Latest factsheet - HDFC Flexi Cap Fund",__ADD-LINK__,Latest TER / benchmark / riskometer,
-7,Groww,HDFC AMC,HDFC ELSS Tax Saver Fund,elss,KIM,"Key Information Memorandum - HDFC ELSS Tax Saver Fund",__ADD-LINK__,3-year lock-in / min SIP / benchmark / riskometer,
-8,Groww,HDFC AMC,HDFC ELSS Tax Saver Fund,elss,SID,"Scheme Information Document - HDFC ELSS Tax Saver Fund",__ADD-LINK__,Lock-in provisions and full terms,
-9,Groww,HDFC AMC,HDFC ELSS Tax Saver Fund,elss,Factsheet,"Latest factsheet - HDFC ELSS Tax Saver Fund",__ADD-LINK__,Latest TER / benchmark / riskometer,
-10,Groww,HDFC AMC,all-3,faq,Scheme FAQs,"Scheme FAQs page - HDFC AMC",__ADD-LINK__,Exit load and lock-in confirmations,
-11,Groww,HDFC AMC,all-3,fees,Charges,"Fees and charges page - HDFC AMC",__ADD-LINK__,TER / stamp duty facts,
-12,Groww,HDFC AMC,all-3,risk,Riskometer notes,"Riskometer and benchmark methodology - HDFC AMC",__ADD-LINK__,Riskometer categories,
-13,Groww,HDFC AMC,all-3,statements,Download guide,"Capital gains statement guide - HDFC AMC",__ADD-LINK__,Capital gains statement steps,
-14,Groww,platform,all-3,statements,Help article,"Download capital gains statement - Groww help",__ADD-LINK__,Product how-to,
-15,Groww,platform,all-3,statements,Help article,"Download consolidated account statement - Groww help",__ADD-LINK__,Product how-to,
-16,Groww,SEBI,all-3,regulator,Investor page,"SEBI mutual funds investor page",__ADD-LINK__,Baseline facts and lock-in regulation,
-17,Groww,AMFI,all-3,education,Investor education,"AMFI investor education page",__ADD-LINK__,ELSS / SIP education (used in refusals),
-18,Groww,SEBI,all-3,regulator,Circular,"SEBI master circular on mutual funds",__ADD-LINK__,ELSS 3-year lock-in authority,
-19,Groww,HDFC AMC,all-3,performance,Factsheet hub,"Scheme factsheet download page - HDFC AMC",__ADD-LINK__,Redirect target for performance questions,
-20,Groww,platform,HDFC Bluechip Fund,scheme-page,Scheme page,"Groww scheme page - HDFC Bluechip Fund",__ADD-LINK__,Cross-check of TER and exit load,
+id,page_title,kind,scheme_name,url,used_for,last_scraped,status
+1,HDFC Mutual Fund - AMC overview,amc,,https://groww.in/mutual-funds/amc/hdfc-mutual-funds,"Refusal links, AMC facts, fallback citation",2026-11-07T06:30:23Z,indexed
+2,HDFC Large Cap Fund - Direct Growth,scheme,HDFC Large Cap Fund Direct Growth,https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth,"Expense ratio / exit load / minimum SIP / riskometer / benchmark / lock-in",2026-11-07T06:30:24Z,indexed
+3,HDFC Flexi Cap - Direct Plan Growth,scheme,HDFC Flexi Cap Direct Plan Growth,https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth,"Expense ratio / exit load / minimum SIP / riskometer / benchmark / lock-in",2026-11-07T06:30:24Z,indexed
+4,HDFC ELSS Tax Saver Fund - Direct Plan Growth,scheme,HDFC ELSS Tax Saver Fund Direct Plan Growth,https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth,"Expense ratio / exit load / minimum SIP / 3-year lock-in / riskometer / benchmark",2026-11-07T06:30:24Z,indexed
+5,HDFC Mid Cap Fund - Direct Growth,scheme,HDFC Mid Cap Fund Direct Growth,https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth,"Expense ratio / exit load / minimum SIP / riskometer / benchmark / lock-in",2026-11-07T06:30:25Z,indexed

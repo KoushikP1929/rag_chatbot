@@ -1,62 +1,83 @@
-# Sample Q&A — MF FAQ Assistant for Groww (facts-only)
+# Sample Q&A — HDFC Fund Facts Assistant (Groww corpus)
 
-All answers are ≤ 3 sentences, contain **exactly one** source link, and end with `Last updated from sources: <date>`. Values below are illustrative placeholders — verify each against the linked official page before submitting, and replace `__ADD-LINK__` with the real URLs from `sources.csv`.
-
----
-
-**Q1. What is the expense ratio of HDFC Bluechip Fund?**
-> The direct plan total expense ratio (TER) of HDFC Bluechip Fund is 0.32%, and the regular plan TER is 0.63%. TER changes periodically, so check the current factsheet for the latest figure. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (factsheet)
+These are the answers the prototype returns for the current 5-page corpus (scraped `2026-11-07T06:30:25Z`). Answers stay within 3 sentences; the citation is the single Groww page shown in the source chip; the card meta row shows `Last updated from sources: 2026-11-07`.
 
 ---
 
-**Q2. What is the exit load on HDFC Flexi Cap Fund?**
-> An exit load of 1% applies if units are redeemed within 1 year of investment; there is no exit load after 1 year. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (KIM)
+**Q1. What is the expense ratio of HDFC Large Cap Fund?**
+> The direct plan expense ratio of HDFC Large Cap Fund is 1.01%. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth
+> *Mode: fact · Citation from retrieved chunk*
 
 ---
 
-**Q3. What is the minimum SIP amount for HDFC Bluechip Fund?**
-> The minimum SIP instalment is ₹300 per month. The minimum lumpsum investment is ₹100. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (KIM)
+**Q2. What is the expense ratio of HDFC Flexi Cap Fund?**
+> The direct plan expense ratio of HDFC Flexi Cap Fund is 0.75%. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth
 
 ---
 
-**Q4. What is the lock-in period for HDFC ELSS Tax Saver Fund?**
-> HDFC ELSS Tax Saver is an ELSS with a mandatory lock-in of 3 years from the date of each investment, as required by SEBI. Each SIP instalment is locked separately for 3 years. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (SID)
+**Q3. What is the exit load on HDFC Mid Cap Fund?**
+> HDFC Mid Cap Fund charges an exit load of 1% if units are redeemed within 1 year. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth
 
 ---
 
-**Q5. What is the riskometer level of HDFC Flexi Cap Fund?**
-> The scheme is classified "Very High risk" on the riskometer, per the latest factsheet. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (factsheet)
+**Q4. What is the minimum SIP for HDFC ELSS Tax Saver Fund?**
+> The minimum SIP for HDFC ELSS Tax Saver Fund is ₹500 per instalment. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth
 
 ---
 
-**Q6. What is the benchmark of HDFC ELSS Tax Saver Fund?**
-> The scheme's benchmark index is the NIFTY 500 Total Return Index. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (KIM)
+**Q5. What is the lock-in period for HDFC ELSS Tax Saver Fund?**
+> HDFC ELSS Tax Saver Fund has a lock-in of 3 years. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth
 
 ---
 
-**Q7. How do I download my capital gains statement on Groww?**
-> Log in to Groww, open the Reports/Statements section, choose Capital Gains Statement and select the financial year to download. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (Groww help)
+**Q6. What is the riskometer level of HDFC Large Cap Fund?**
+> HDFC Large Cap Fund is classified as "Moderately High" risk on the riskometer. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth
 
 ---
 
-**Q8. Should I buy HDFC Bluechip or HDFC Flexi Cap?** *(refusal example)*
-> I can't recommend which scheme to buy or sell — I share facts only from official sources, not investment advice. For education on evaluating schemes, see AMFI's investor education page. 📎 Source: `__ADD-LINK__` (AMFI)
-
-*(Optional extra — performance refusal)*
-
-**Q9. Which fund gave better returns?** *(refusal + redirect)*
-> I don't compute or compare returns — performance information is best read from the official factsheet. Last updated from sources: `<date>`.
-> 📎 Source: `__ADD-LINK__` (AMC factsheet hub)
+**Q7. What is the benchmark of HDFC Flexi Cap Fund?**
+> The benchmark for HDFC Flexi Cap Fund is the NIFTY 500 Total Return Index (NIFTY 500 TRI). Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth
 
 ---
 
-## Disclaimer used in the UI
+**Q8. How do I download my capital gains statement?** *(known corpus gap)*
+> I don't have that fact in the indexed pages. You can check the sourced page below. Last updated from sources: 2026-11-07.
+> 📎 Source: https://groww.in/mutual-funds/amc/hdfc-mutual-funds
+> *Mode: fact · Intent recognised, but no statement section exists in the 5-page corpus*
 
-> **Facts-only. No investment advice.** This assistant answers factual questions about mutual fund schemes using official public pages (AMC/SEBI/AMFI) and always shows one source link. It does not recommend schemes, predict returns, or compare performance, and it stores no personal information. Last updated from sources: `<date>`.
+---
+
+**Q9. Should I buy HDFC Mid Cap Fund?** *(advice refusal)*
+> I cannot advise on whether to buy, sell, or switch between schemes. I can look up facts like the expense ratio, exit load, minimum SIP, lock-in, riskometer, or benchmark instead.
+> 📎 Source: https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth
+> *Mode: advice · Fixed refusal text, no LLM call*
+
+---
+
+**Q10. Which fund gave the best returns?** *(returns refusal)*
+> I do not provide return numbers or calculate performance. Please check the official HDFC Mutual Fund factsheet. I can answer facts like the expense ratio, exit load, minimum SIP, lock-in, riskometer, or benchmark from the page below.
+> 📎 Source: https://groww.in/mutual-funds/amc/hdfc-mutual-funds
+> *Mode: returns · No performance data is generated or compared*
+
+---
+
+**Q11. "My email is abc@example.com — what is the exit load?"** *(PII rejection)*
+> Your question appears to contain an email address. Please remove personal details and resubmit your question.
+> *HTTP 400 · mode: pii · no citation, no retrieval, nothing stored*
+
+---
+
+## Disclaimer shown in the UI
+
+> **Facts-only. No investment advice.**
+
+Answer cards also state that answers come from five indexed Groww pages and cite one of them.
+
+*`Last updated from sources: 2026-11-07` (from `data/documents/_index.json`).*
