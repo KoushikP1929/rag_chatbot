@@ -38,7 +38,7 @@ src/cli.py  src/app.py
 tests/
 ```
 
-`config.yaml` holds the five Groww URLs, embedding model `sentence-transformers/all-MiniLM-L6-v2`, Chroma path `data/chroma` and collection `hdfc_facts`, LLM provider `groq`, `top_k: 5`, and the disclaimer `Facts-only. No investment advice.`
+`config.yaml` holds the five Groww URLs, embedding model `gemini-embedding-001` (768 dims; questions embedded via `query_provider` — local `sentence-transformers` on desktop, Gemini API on Vercel), Chroma path `data/chroma` and collection `hdfc_facts`, LLM provider `groq`, `top_k: 5`, and the disclaimer `Facts-only. No investment advice.`
 
 `.env` holds the provider API key and `LLM_MODEL`. The example value `qwen/qwen3.8-27b` is a placeholder until it is checked against Groq's model list. Allowed providers: Groq, Gemini, OpenAI, Anthropic, Mistral.
 
@@ -90,7 +90,7 @@ Done when the ELSS page has a lock-in chunk and the same input produces the same
 
 ## 5. Embedding
 
-Embed each chunk with the model in config (`sentence-transformers/all-MiniLM-L6-v2`). Write `data/embeddings/<slug>.json` with the model id, chunk id, vector, and chunk metadata. Vectors are L2-normalized.
+Embed each chunk with the model in config (`gemini-embedding-001`, 768 dims, task type `RETRIEVAL_DOCUMENT`; vectors are committed so serverless deployments never re-embed). Write `data/embeddings/<slug>.json` with the model id, chunk id, vector, and chunk metadata. Vectors are L2-normalized.
 
 If existing embeddings were made with a different model, stop unless `--force` is passed.
 

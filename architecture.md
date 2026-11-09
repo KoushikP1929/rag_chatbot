@@ -50,7 +50,7 @@ Everything runs locally. The only outbound calls are the five HTTP fetches at in
 | HTTP fetch | `httpx` (or `requests`) | Plain GET with timeout and User-Agent |
 | HTML→text extraction | `trafilatura` with a `BeautifulSoup`/`lxml` fallback | Keep raw HTML alongside extracted text |
 | Text processing | Heading/label-aware parser | See chunking strategy |
-| Embeddings | `sentence-transformers` (`all-MiniLM-L6-v2` default) | Model id from config |
+| Embeddings | `gemini-embedding-001` (768 dims) via `generativelanguage.googleapis.com`; local `sentence-transformers` also supported | Model id from config; ingestion and question vectors must share one space |
 | Vector store | ChromaDB, `PersistentClient` | Local path from config |
 | LLM access | Thin provider adapter interface | Groq default; Gemini, OpenAI, Anthropic, Mistral allowed |
 | Config | YAML (or JSON) + `.env` via `python-dotenv` | Secrets only in `.env` |
@@ -128,7 +128,8 @@ corpus:
   # flexi cap, ELSS, mid cap follow the same shape
 
 embedding:
-  model: sentence-transformers/all-MiniLM-L6-v2
+  model: gemini-embedding-001
+  query_provider: local   # "gemini" on Vercel via EMBEDDING_QUERY_PROVIDER
 
 vectorstore:
   engine: chroma
@@ -335,7 +336,7 @@ The same formatter is used by the CLI and the UI, so acceptance checks hold for 
 
 ```json
 {
-  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "model": "gemini-embedding-001",
   "chunks": [
     { "chunk_id": "…", "vector": [0.013, -0.042, "…"], "metadata": { "…chunk metadata…" } }
   ]
@@ -350,7 +351,7 @@ The same formatter is used by the CLI and the UI, so acceptance checks hold for 
   "timestamp": "2026-11-06T09:30:00Z",
   "question": "What is the exit load on HDFC Large Cap Fund?",
   "mode": "fact",
-  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_model": "gemini-embedding-001",
   "llm": { "provider": "groq", "model": "…" },
   "retrieved": [
     { "chunk_id": "…", "score": 0.81, "section": "Exit Load", "source_url": "https://groww.in/…" }

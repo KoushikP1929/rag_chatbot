@@ -51,12 +51,7 @@ def ask_route(payload: dict):
     except RetrievalError as exc:
         return {"error": _friendly_error(str(exc))}
     except Exception as exc:  # noqa: BLE001 - the UI never shows a stack trace
-        # TEMP DIAGNOSTIC: surfaced for the serverless rollout; revert to the
-        # plain message once the deployment issue is identified.
-        import traceback
-
-        traceback.print_exc()
-        return {"error_type": type(exc).__name__, "error": _friendly_error(str(exc))}
+        return {"error": _friendly_error(str(exc))}
     if result.mode == "pii":
         return JSONResponse(status_code=400, content={"error": result.answer, "mode": "pii"})
     return {
@@ -68,30 +63,6 @@ def ask_route(payload: dict):
         "query_id": result.query_id,
         "trace": result.trace,
     }
-
-
-@app.get("/net-probe")
-def net_probe() -> dict:
-    """TEMP: outbound reachability matrix from this sandbox."""
-    import urllib.error
-    import urllib.request
-
-    results = {}
-    for name, url in (
-        ("hf-hub-api", "https://huggingface.co/api/models/all-MiniLM-L6-v2"),
-        ("hf-cdn-lfs", "https://cdn-lfs.huggingface.co/"),
-        ("gemini", "https://generativelanguage.googleapis.com/v1beta/models"),
-        ("groq", "https://api.groq.com/openai/v1/models"),
-    ):
-        try:
-            request = urllib.request.Request(url, headers={"User-Agent": "rag-bot-net-probe/1.0"})
-            with urllib.request.urlopen(request, timeout=15) as response:
-                results[name] = {"status": response.status}
-        except urllib.error.HTTPError as error:
-            results[name] = {"status": error.code, "note": "connected OK, got HTTP error"}
-        except Exception as error:
-            results[name] = {"status": "fail", "error_type": type(error).__name__, "error": str(error)}
-    return {"results": results}
 
 
 @app.get("/health")
