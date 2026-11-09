@@ -27,7 +27,7 @@ def test_repo_config_loads():
     config = load_config(ROOT_CONFIG, ENV)
     assert len(config.corpus) == 5
     assert config.provider == "groq"
-    assert config.embedding_model == "sentence-transformers/all-MiniLM-L6-v2"
+    assert config.embedding_model == "gemini-embedding-001"
     assert config.collection == "hdfc_facts"
     assert config.disclaimer == "Facts-only. No investment advice."
     assert config.llm_model == "qwen/qwen3.8-27b"

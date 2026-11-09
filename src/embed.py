@@ -162,6 +162,91 @@ def _hf_post(url: str, headers: dict, texts: list[str]):
         return _HTTPResponse(error.code, error.read())
 
 
+def load_gemini_encoder(model_name: str, token: str | None = None, task_type: str = "RETRIEVAL_QUERY") -> Encode:
+    """Embeddings via the Gemini embedContent API (generativelanguage host).
+
+    The Vercel sandbox cannot load local sentence-transformers weights (the HF
+    CDN that serves them is blocked) and HF Inference reserves embeddings for
+    paid accounts, so Gemini's free-tier embeddings API is the serverless path.
+    Ingestion and questions must use the SAME model and dimensionality;
+    task_type selects Google's RETRIEVAL_DOCUMENT vs RETRIEVAL_QUERY heads,
+    which stay in one vector space. The caller normalizes vectors, like every
+    other encoder."""
+    url = _gemini_url(model_name)
+    key = ("gemini", url, task_type, _GEMINI_DIM, bool(token))
+    cached = _ENCODER_CACHE.get(key)
+    if cached is not None:
+        return cached
+    headers = {"x-goog-api-key": token or ""}
+
+    def encode(texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        response = _gemini_post(url, headers, texts, task_type, _GEMINI_DIM)
+        if response.status_code != 200:
+            raise EmbedError(
+                "embedding.gemini", f"embeddings endpoint returned HTTP {response.status_code}"
+            )
+        try:
+            payload = response.json()
+        except ValueError as exc:
+            raise EmbedError("embedding.gemini", "embeddings endpoint returned a non-JSON body") from exc
+        rows = payload.get("embeddings") if isinstance(payload, dict) else None
+        if not isinstance(rows, list) or len(rows) != len(texts):
+            raise EmbedError("embedding.gemini", f"expected {len(texts)} embeddings from the endpoint")
+        vectors: list[list[float]] = []
+        for row in rows:
+            values = row.get("values") if isinstance(row, dict) else None
+            if not isinstance(values, list) or not all(isinstance(v, (int, float)) for v in values):
+                raise EmbedError("embedding.gemini", "an embedding row was missing its values")
+            if len(values) != _GEMINI_DIM:
+                raise EmbedError(
+                    "embedding.gemini", f"expected {_GEMINI_DIM}-dim vectors, got {len(values)}"
+                )
+            vectors.append([float(v) for v in values])
+        return vectors
+
+    _ENCODER_CACHE[key] = encode
+    return encode
+
+
+_GEMINI_DIM = 768
+
+
+def _gemini_url(model_name: str) -> str:
+    return f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:batchEmbedContents"
+
+
+def _gemini_post(url: str, headers: dict, texts: list[str], task_type: str, dims: int):
+    """batchEmbedContents POST using the stdlib transport (see _hf_post)."""
+    import json as _json
+    import urllib.request
+
+    model = url.rsplit("/", 1)[1].split(":", 1)[0]
+    payload = {
+        "requests": [
+            {
+                "model": "models/" + model,
+                "content": {"parts": [{"text": text}]},
+                "taskType": task_type,
+                "outputDimensionality": dims,
+            }
+            for text in texts
+        ]
+    }
+    request = urllib.request.Request(
+        url,
+        data=_json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", "User-Agent": "rag-bot/1.0", **headers},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return _HTTPResponse(response.status, response.read())
+    except urllib.error.HTTPError as error:
+        return _HTTPResponse(error.code, error.read())
+
+
 class _HTTPResponse:
     """The small shape (status_code + json) the encoder code expects."""
 
@@ -169,7 +254,7 @@ class _HTTPResponse:
         self.status_code = status_code
         self._body = body
 
-    def json(self) -> list:
+    def json(self) -> dict | list:
         import json as _json
 
         return _json.loads(self._body.decode("utf-8"))

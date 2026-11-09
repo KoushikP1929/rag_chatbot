@@ -50,6 +50,10 @@ def retrieve(
 
             if config.query_provider == "hf-inference":
                 embed = load_remote_encoder(config.embedding_model, config.hf_endpoint, config.hf_token)
+            elif config.query_provider == "gemini":
+                from src.embed import load_gemini_encoder
+
+                embed = load_gemini_encoder(config.embedding_model, config.gemini_token, "RETRIEVAL_QUERY")
             else:
                 embed = load_encoder(config.embedding_model)
         vectors = embed([question])

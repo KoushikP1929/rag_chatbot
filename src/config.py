@@ -101,6 +101,7 @@ class AppConfig:
     query_provider: str = "local"
     hf_endpoint: str | None = None
     hf_token: str | None = None
+    gemini_token: str | None = None
 
 
 def load_config(
@@ -177,8 +178,8 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
 
     embedding_block = embedding
     query_provider = (environ.get("EMBEDDING_QUERY_PROVIDER") or embedding_block.get("query_provider", "local")).strip().lower()
-    if query_provider not in ("local", "hf-inference"):
-        raise ConfigError("embedding.query_provider", "must be 'local' or 'hf-inference'")
+    if query_provider not in ("local", "hf-inference", "gemini"):
+        raise ConfigError("embedding.query_provider", "must be 'local', 'hf-inference', or 'gemini'")
     hf_endpoint_default = "https://router.huggingface.co/hf-inference/models/{model}"
     hf_endpoint = embedding_block.get("hf_endpoint", hf_endpoint_default)
     hf_token = (environ.get("HF_API_TOKEN") or "").strip() or None
@@ -186,6 +187,12 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
         raise ConfigError(
             "HF_API_TOKEN",
             "hf-inference question embeddings need a Hugging Face token; create a free one on huggingface.co/settings/tokens",
+        )
+    gemini_token = (environ.get("GEMINI_API_KEY") or "").strip() or None
+    if query_provider == "gemini" and not gemini_token:
+        raise ConfigError(
+            "GEMINI_API_KEY",
+            "gemini question embeddings need an API key; create a free one on aistudio.google.com/apikey",
         )
     return AppConfig(
         corpus=tuple(corpus),
@@ -207,6 +214,7 @@ def _build(raw: dict, environ: Mapping[str, str]) -> AppConfig:
         query_provider=query_provider,
         hf_endpoint=hf_endpoint,
         hf_token=hf_token,
+        gemini_token=gemini_token,
     )
 
 

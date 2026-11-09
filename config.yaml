@@ -25,9 +25,14 @@ corpus:
     scheme_name: HDFC Mid Cap Fund Direct Growth
 
 embedding:
-  model: sentence-transformers/all-MiniLM-L6-v2
+  # Ingestion and question embeddings: gemini-embedding-001 at 768 dims
+  # (task types RETRIEVAL_DOCUMENT / RETRIEVAL_QUERY). Committed
+  # data/embeddings/* were produced with exactly this model.
+  model: gemini-embedding-001
   # How the QUESTION is embedded at runtime. "local" loads sentence-transformers
-  # (desktop/server). "hf-inference" calls the same model id over HTTP (Vercel).
+  # (desktop/server). "hf-inference" calls the same model id over HTTP (needs
+  # HF inference credits). "gemini" calls Gemini embeddings over HTTP —
+  # the serverless path on Vercel (EMBEDDING_QUERY_PROVIDER env override).
   query_provider: local
   hf_endpoint: https://router.huggingface.co/hf-inference/models/{model}
 
