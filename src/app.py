@@ -70,6 +70,30 @@ def ask_route(payload: dict):
     }
 
 
+@app.get("/net-probe")
+def net_probe() -> dict:
+    """TEMP: outbound reachability matrix from this sandbox."""
+    import urllib.error
+    import urllib.request
+
+    results = {}
+    for name, url in (
+        ("hf-hub-api", "https://huggingface.co/api/models/all-MiniLM-L6-v2"),
+        ("hf-cdn-lfs", "https://cdn-lfs.huggingface.co/"),
+        ("gemini", "https://generativelanguage.googleapis.com/v1beta/models"),
+        ("groq", "https://api.groq.com/openai/v1/models"),
+    ):
+        try:
+            request = urllib.request.Request(url, headers={"User-Agent": "rag-bot-net-probe/1.0"})
+            with urllib.request.urlopen(request, timeout=15) as response:
+                results[name] = {"status": response.status}
+        except urllib.error.HTTPError as error:
+            results[name] = {"status": error.code, "note": "connected OK, got HTTP error"}
+        except Exception as error:
+            results[name] = {"status": "fail", "error_type": type(error).__name__, "error": str(error)}
+    return {"results": results}
+
+
 @app.get("/health")
 def health() -> dict:
     config = _config()
